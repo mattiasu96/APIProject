@@ -5,37 +5,91 @@
 
 #define MAX 5
 typedef struct {
-	int startState;
-	char readInput;
-	char writeOutput;
-	char shiftTape;
-	int nextState;
+    int startState;
+    char readInput;
+    char writeOutput;
+    char shiftTape;
+    int nextState;
 
 } Transition;
+//Pointer to single struct
+typedef Transition *transitionPointer;
+//Pointer to the array of transitions (grouped by state)
+typedef Transition **arrayOfTransitionPointer;
+
+
+
 
 Transition acquireTransition();
 
 
 
 int main() {
-	Transition temporaryTransition;
-	char phantomString[10];
-	char inputCharacters[256];
-	scanf("%s", phantomString);
-	printf("%s\n", phantomString);
+    Transition temporaryTransition;
+    char phantomString[10];
+    //int arraySize = 256;
+    arrayOfTransitionPointer inputCharacters[256] = {NULL};
+    int tempchar;
+    //arrayOfTransitionPointer tempPointer;
+    scanf("%s", phantomString);
+    printf("%s\n", phantomString);
 
-	while(temporaryTransition.startState!= -1){
-	temporaryTransition = acquireTransition();
-	printf("%d", temporaryTransition.startState);
-	if(temporaryTransition.startState!= -1){
-	printf("%c", temporaryTransition.readInput);
-	printf("%c", temporaryTransition.writeOutput);
-	printf("%c", temporaryTransition.shiftTape);
-	printf("%d\n", temporaryTransition.nextState);}
+    while(temporaryTransition.startState!= -1){
+    temporaryTransition = acquireTransition();
+    printf("%d", temporaryTransition.startState);
+    if(temporaryTransition.startState!= -1){
+    printf("%c", temporaryTransition.readInput);
+    printf("%c", temporaryTransition.writeOutput);
+    printf("%c", temporaryTransition.shiftTape);
+    printf("%d\n", temporaryTransition.nextState);
+
+    //Fast check of conversion from ASCII to number, in order to insert in the right index
+    tempchar = (int) temporaryTransition.readInput;
+    printf("%d\n", tempchar);
+
+    arrayOfTransitionPointer p=NULL;
+    printf("%p\n",p );
+    //p= (transitionPointer *)calloc(256,sizeof(transitionPointer));
+    transitionPointer p2=NULL;
+
+    p2=(Transition *) malloc(sizeof(Transition));
+    p2->startState = 10;
+
+    p= (transitionPointer *)calloc(256,sizeof(transitionPointer));
+    p[0]=p2;
+    printf("Prima del test\n");
+    printf("%d\n",p[0]->startState );
+
+    inputCharacters[0]=p;
+    printf("%d\n", (**inputCharacters[0]).startState  );
+
+    
+/*
+    printf("%p\n",p[0]);
+    printf("prima di\n");
+    printf("%p\n",p );
+    inputCharacters[tempchar] = p;
+    printf("%p\n", inputCharacters[tempchar]  );*/
+    
+
+
+    
+
+    
 
 
 
-	}
+
+
+
+
+
+    }
+
+
+
+
+    }
 
 
     
@@ -44,8 +98,8 @@ int main() {
 }
 
 Transition acquireTransition(){
-	Transition transition;
-	char *start = NULL;
+    Transition transition;
+    char *start = NULL;
     char *end = NULL;
     char in, out, shift;
     int firstState;
@@ -77,17 +131,17 @@ Transition acquireTransition(){
             //Now i insert the read data into a Transition Node
 
             firstState = atoi(start);
-    		secondState = atoi(end);
+            secondState = atoi(end);
 
-    		transition.startState = firstState;
-    		transition.readInput = in;
-    		transition.writeOutput = out;
-    		transition.shiftTape = shift;
-    		transition.nextState = secondState;
+            transition.startState = firstState;
+            transition.readInput = in;
+            transition.writeOutput = out;
+            transition.shiftTape = shift;
+            transition.nextState = secondState;
 
         }
         else {
-        	transition.startState= -1;
+            transition.startState= -1;
         }
     
     
