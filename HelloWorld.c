@@ -12,33 +12,23 @@ typedef struct {
 	int nextState;
 
 } Transition;
-//Pointer to single struct
-typedef Transition *transitionPointer;
-//Pointer to the array of transitions (grouped by state)
-typedef Transition **arrayOfTransitionPointer;
-
-
-
 
 Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
+void scantr();
 
 
 
 int main() {
 	Transition *temporaryTransition=NULL;
-	char phantomString[10];
-	//int arraySize = 256;
 	Transition **inputCharacters[256] = {NULL};
 	int tempchar;
 	int hashmapIndex;
-	//arrayOfTransitionPointer tempPointer;
+	Transition **p=NULL;
 
 	//Stringa usata per scartare il tr
-	scanf("%s", phantomString);
-	printf("%s\n", phantomString);
-	//NB PROVA A INIZIALIZZARE TEMPORARY TRANSITION A NULL! PRIMA HO FATTO UN CONTROLLO SU IF SU UN PUNTATORE NON ANCORA INIZIALIZZATO! 
-	//PUO' ESSERE QUELLO IL PROBLEMA DEL SEGMENTATION FAULT
+	scantr();
+	
 	do{
 		//Ricevo puntatore alla transition creata
 		temporaryTransition = acquireTransition();
@@ -54,19 +44,15 @@ int main() {
 			printf("%d\n", tempchar);
 
 			//Creo un singolo puntatore dello stesso di inputCharacters e gli alloco la hashmap
-			Transition **p=NULL;
+			
 		 	printf("%p\n",p );
 			p= (Transition **)calloc(256,sizeof(Transition*));
 
-			//Creo il puntatore alla singola struct Transition
-		 	Transition *p2=NULL;
-			p2=temporaryTransition;
-
-		 	//Qui metto il puntatore della hashmap uguale a quello che punta alla singola struct, così ottengo il riferimento ad essa.
+			//Qui metto il puntatore della hashmap uguale a quello che punta alla singola struct, così ottengo il riferimento ad essa.
 		 	//L'indice è dato dalla funzione di hashing
-			hashmapIndex = calculateHashMap(p2->startState);
+			hashmapIndex = calculateHashMap(temporaryTransition->startState);
 			printf("%d\n", hashmapIndex);
-			p[hashmapIndex]=p2;
+			p[hashmapIndex]=temporaryTransition;
 			printf("Prima del test\n");
 			//printf("%d\n",p[0]->startState );
 
@@ -149,6 +135,9 @@ Transition *acquireTransition(){
 
 int calculateHashMap(int stateNumber){
 	return stateNumber%256;
-
-
+}
+void scantr(){
+	char phantomString[10];
+	scanf("%s", phantomString);
+	printf("%s\n", phantomString);
 }
