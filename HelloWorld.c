@@ -19,6 +19,7 @@ typedef struct T{
 Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
 void scantr();
+void inserisciCoda(Transition *element,Transition *position);
 
 
 
@@ -27,7 +28,7 @@ int main() {
 	Transition **inputCharacters[256] = {NULL};
 	int tempchar;
 	int hashmapIndex;
-	Transition **p=NULL;
+	Transition *p=NULL;
 
 	//Stringa usata per scartare il tr
 	scantr();
@@ -35,7 +36,6 @@ int main() {
 	do{
 		//Ricevo puntatore alla transition creata
 		temporaryTransition = acquireTransition();
-		printf("%d", temporaryTransition->startState);
 		if(temporaryTransition->startState!= -1){
 			printf("%c", temporaryTransition->readInput);
 			printf("%c", temporaryTransition->writeOutput);
@@ -48,7 +48,6 @@ int main() {
 
 			//Creo un singolo puntatore dello stesso di inputCharacters e gli alloco la hashmap
 			
-		 	printf("%p\n",p );
 		 	if(inputCharacters[tempchar]==NULL){
 				inputCharacters[tempchar]=(Transition **)calloc(SIZE,sizeof(Transition*));;
 			}
@@ -57,20 +56,30 @@ int main() {
 			if(inputCharacters[tempchar][hashmapIndex]==0){
 				inputCharacters[tempchar][hashmapIndex]=temporaryTransition;
 			}
-			else
+			else{
 				//Inserire elemento nella coda e scompare anche l'errore di memoria
-				printf("Elemento già inserito in questa posizione: accodare\n");
+				inserisciCoda(temporaryTransition,inputCharacters[tempchar][hashmapIndex]);
+				printf("Elemento già inserito in questa posizione: sto accodando\n");
+			}
 			printf("printo valore dell'hashmap index: %d\n", hashmapIndex);
 			
 			printf("Prima del test\n");
+			p=inputCharacters[tempchar][hashmapIndex];
+			while (p->prox!=NULL){
+				
+				printf("Printo valore in inputCharacters: %d\n",p->startState);	
+				printf("Printo valore in inputCharacters: %c\n",p->writeOutput);	
+				p = p-> prox;	
+			} 
 			
-			printf("Printo valore in inputCharacters: %d\n",inputCharacters[tempchar][hashmapIndex]->startState);
+			
 		
 
 		}
 
 	}while(temporaryTransition->startState!= -1);
 	free(temporaryTransition);
+
 
     
 
@@ -146,4 +155,15 @@ void scantr(){
 	char phantomString[10];
 	scanf("%s", phantomString);
 	printf("%s\n", phantomString);
+}
+
+void inserisciCoda(Transition *element,Transition *position){
+	Transition *scanner = NULL;
+	scanner = position;
+	while(scanner->prox!=NULL){
+		scanner=scanner->prox;
+	}
+	scanner->prox = element;
+
+
 }

@@ -4,92 +4,81 @@
 
 
 #define MAX 5
-typedef struct {
+#define SIZE 256
+typedef struct T{
     int startState;
     char readInput;
     char writeOutput;
     char shiftTape;
     int nextState;
+    struct T *prox;
+
 
 } Transition;
-//Pointer to single struct
-typedef Transition *transitionPointer;
-//Pointer to the array of transitions (grouped by state)
-typedef Transition **arrayOfTransitionPointer;
 
-
-
-
-Transition acquireTransition();
+Transition *acquireTransition();
+int calculateHashMap(int stateNumber);
+void scantr();
+void inserisciCoda(Transition *element,Transition *position);
 
 
 
 int main() {
-    Transition temporaryTransition;
-    char phantomString[10];
-    //int arraySize = 256;
-    arrayOfTransitionPointer inputCharacters[256] = {NULL};
+    Transition *temporaryTransition=NULL;
+    Transition **inputCharacters[256] = {NULL};
     int tempchar;
-    //arrayOfTransitionPointer tempPointer;
-    scanf("%s", phantomString);
-    printf("%s\n", phantomString);
+    int hashmapIndex;
+    Transition *p=NULL;
 
-    while(temporaryTransition.startState!= -1){
-    temporaryTransition = acquireTransition();
-    printf("%d", temporaryTransition.startState);
-    if(temporaryTransition.startState!= -1){
-    printf("%c", temporaryTransition.readInput);
-    printf("%c", temporaryTransition.writeOutput);
-    printf("%c", temporaryTransition.shiftTape);
-    printf("%d\n", temporaryTransition.nextState);
-
-    //Fast check of conversion from ASCII to number, in order to insert in the right index
-    tempchar = (int) temporaryTransition.readInput;
-    printf("%d\n", tempchar);
-
-    arrayOfTransitionPointer p=NULL;
-    printf("%p\n",p );
-    //p= (transitionPointer *)calloc(256,sizeof(transitionPointer));
-    transitionPointer p2=NULL;
-
-    p2=(Transition *) malloc(sizeof(Transition));
-    p2->startState = 10;
-
-    p= (transitionPointer *)calloc(256,sizeof(transitionPointer));
-    p[0]=p2;
-    printf("Prima del test\n");
-    printf("%d\n",p[0]->startState );
-
-    inputCharacters[0]=p;
-    printf("%d\n", (**inputCharacters[0]).startState  );
-
+    //Stringa usata per scartare il tr
+    scantr();
     
-/*
-    printf("%p\n",p[0]);
-    printf("prima di\n");
-    printf("%p\n",p );
-    inputCharacters[tempchar] = p;
-    printf("%p\n", inputCharacters[tempchar]  );*/
-    
+    do{
+        //Ricevo puntatore alla transition creata
+        temporaryTransition = acquireTransition();
+        if(temporaryTransition->startState!= -1){
+            printf("%c", temporaryTransition->readInput);
+            printf("%c", temporaryTransition->writeOutput);
+            printf("%c", temporaryTransition->shiftTape);
+            printf("%d\n", temporaryTransition->nextState);
 
+            //Fast check of conversion from ASCII to number, in order to insert in the right index
+            tempchar = (int) temporaryTransition->readInput;
+            printf("%d\n", tempchar);
 
-    
+            //Creo un singolo puntatore dello stesso di inputCharacters e gli alloco la hashmap
+            
+            if(inputCharacters[tempchar]==NULL){
+                inputCharacters[tempchar]=(Transition **)calloc(SIZE,sizeof(Transition*));;
+            }
+            
+            hashmapIndex = calculateHashMap(temporaryTransition->startState);
+            if(inputCharacters[tempchar][hashmapIndex]==0){
+                inputCharacters[tempchar][hashmapIndex]=temporaryTransition;
+            }
+            else{
+                //Inserire elemento nella coda e scompare anche l'errore di memoria
+                inserisciCoda(temporaryTransition,inputCharacters[tempchar][hashmapIndex]);
+                printf("Elemento già inserito in questa posizione: sto accodando\n");
+            }
+            printf("printo valore dell'hashmap index: %d\n", hashmapIndex);
+            
+            printf("Prima del test\n");
+            p=inputCharacters[tempchar][hashmapIndex];
+            while (p->prox!=NULL){
+                
+                printf("Printo valore in inputCharacters: %d\n",p->startState); 
+                printf("Printo valore in inputCharacters: %c\n",p->writeOutput);    
+                p = p-> prox;   
+            } 
+            
+            
+        
 
-    
+        }
 
-
-
-
-
-
-
-
-    }
-
-
-
-
-    }
+    }while(temporaryTransition->startState!= -1);
+    free(temporaryTransition);
 
 
     
@@ -97,8 +86,8 @@ int main() {
     return 0;
 }
 
-Transition acquireTransition(){
-    Transition transition;
+Transition *acquireTransition(){
+    Transition *transition=NULL;
     char *start = NULL;
     char *end = NULL;
     char in, out, shift;
@@ -114,7 +103,7 @@ Transition acquireTransition(){
         fflush ( stdout);
         scanf("%ms", &start);
         
-
+        transition=malloc(sizeof(Transition));
         if(strcmp(start, "acc") != 0) {
             if ( end) {
                 free ( end);
@@ -133,15 +122,16 @@ Transition acquireTransition(){
             firstState = atoi(start);
             secondState = atoi(end);
 
-            transition.startState = firstState;
-            transition.readInput = in;
-            transition.writeOutput = out;
-            transition.shiftTape = shift;
-            transition.nextState = secondState;
+            transition->startState = firstState;
+            transition->readInput = in;
+            transition->writeOutput = out;
+            transition->shiftTape = shift;
+            transition->nextState = secondState;
+            transition->prox = NULL;
 
         }
         else {
-            transition.startState= -1;
+            transition->startState= -1;
         }
     
     
@@ -155,4 +145,25 @@ Transition acquireTransition(){
     }
 
     return transition;
+}
+
+
+int calculateHashMap(int stateNumber){
+    return stateNumber%256;
+}
+void scantr(){
+    char phantomString[10];
+    scanf("%s", phantomString);
+    printf("%s\n", phantomString);
+}
+
+void inserisciCoda(Transition *element,Transition *position){
+    Transition *scanner = NULL;
+    scanner = position;
+    while(scanner->prox!=NULL){
+        scanner=scanner->prox;
+    }
+    scanner->prox = element;
+
+
 }
