@@ -46,26 +46,30 @@ int main() {
 			//Creo un singolo puntatore dello stesso di inputCharacters e gli alloco la hashmap
 			
 		 	printf("%p\n",p );
-			p= (Transition **)calloc(256,sizeof(Transition*));
+		 	if(inputCharacters[tempchar]==NULL){
+				p= (Transition **)calloc(256,sizeof(Transition*));
+				inputCharacters[tempchar]=p;
+			}
 
 			//Qui metto il puntatore della hashmap uguale a quello che punta alla singola struct, così ottengo il riferimento ad essa.
 		 	//L'indice è dato dalla funzione di hashing
 			hashmapIndex = calculateHashMap(temporaryTransition->startState);
-			printf("%d\n", hashmapIndex);
-			p[hashmapIndex]=temporaryTransition;
+			inputCharacters[tempchar][hashmapIndex]=temporaryTransition;
+			printf("printo valore dell'hashmap index: %d\n", hashmapIndex);
+			
 			printf("Prima del test\n");
-			//printf("%d\n",p[0]->startState );
 
 			//Qui inserisco il il puntatore alla hashmap i-esima nel inputCharacter i-esimo. La cella dove inserirla mi è data dalla lettera di ingresso.
 			// ERRORE: NON STO GESTENDO I DUE INDICI! COSI' STO DICENDO SOLO INDICE DI INPUT CHAR, MA POI NON SPECIFICO QUELLO DELL'HASHMAP
-			inputCharacters[tempchar]=p;
-			printf("%d\n",inputCharacters[tempchar][hashmapIndex]->startState);
+			
+			printf("Printo valore in inputCharacters: %d\n",inputCharacters[tempchar][hashmapIndex]->startState);
 		
 
 		}
 
 	}while(temporaryTransition->startState!= -1);
 
+	free(temporaryTransition);
 
     
 
