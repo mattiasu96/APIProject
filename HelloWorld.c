@@ -89,6 +89,7 @@ int main() {
 
 
 	acceptStates = acquireAcceptStates();
+
 	return 0;
 }
 
@@ -193,16 +194,18 @@ int *acquireAcceptStates(){
 	int counter2=1;
 	int number=0;
 	char *c=NULL;
-	if(c){
-		free(c);
-		c=NULL;
-	}
+	
 
   	p=malloc(sizeof(int)*acceptNumber);
 
 
 	while(c==NULL || strcmp(c,"max")!=0){
+		if(c){
+			free(c);
+			c=NULL;
+		}
 		scanf("%ms", &c);
+		if(strcmp(c,"max")!=0){
 		number=atoi(c);
 		p[counter]=number;
 		counter++;
@@ -210,10 +213,10 @@ int *acquireAcceptStates(){
 			p=realloc(p,sizeof(int)*acceptNumber+counter2);
 			counter2++;
 		}
-		free(c);
-		c=NULL;
+		}
 
 	}
+	free(c);
 
 	return p;
 
