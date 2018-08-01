@@ -5,6 +5,7 @@
 
 #define MAX 5
 #define SIZE 256
+#define acceptNumber 5
 typedef struct T{
 	int startState;
 	char readInput;
@@ -20,6 +21,8 @@ Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
 void scantr();
 void inserisciCoda(Transition *element,Transition *position);
+int checkMaxStates(Transition *element, int currentMax);
+int *acquireAcceptStates();
 
 
 
@@ -29,6 +32,8 @@ int main() {
 	int tempchar;
 	int hashmapIndex;
 	Transition *p=NULL;
+	int *acceptStates=NULL;
+	int numberOfStates=0;
 
 	//Stringa usata per scartare il tr
 	scantr();
@@ -42,6 +47,8 @@ int main() {
 			printf("%c", temporaryTransition->shiftTape);
 			printf("%d\n", temporaryTransition->nextState);
 
+			numberOfStates = checkMaxStates(temporaryTransition, numberOfStates);
+			printf("Printo numero di stati max: %d\n", numberOfStates);
 			//Fast check of conversion from ASCII to number, in order to insert in the right index
 			tempchar = (int) temporaryTransition->readInput;
 			printf("%d\n", tempchar);
@@ -81,9 +88,8 @@ int main() {
 	free(temporaryTransition);
 
 
-    
-
-    return 0;
+	acceptStates = acquireAcceptStates();
+	return 0;
 }
 
 Transition *acquireTransition(){
@@ -165,5 +171,50 @@ void inserisciCoda(Transition *element,Transition *position){
 	}
 	scanner->prox = element;
 
+
+}
+
+int checkMaxStates(Transition *element,int currentMax){
+	int max=currentMax;
+
+	if(max<element->startState)
+		max = element->startState;
+	if(max<element->nextState)
+		max = element->nextState;
+
+	return max;
+
+
+}
+
+int *acquireAcceptStates(){
+	int *p=NULL;
+	int counter=0;
+	int counter2=1;
+	int number=0;
+	char *c=NULL;
+	if(c){
+		free(c);
+		c=NULL;
+	}
+
+  	p=malloc(sizeof(int)*acceptNumber);
+
+
+	while(c==NULL || strcmp(c,"max")!=0){
+		scanf("%ms", &c);
+		number=atoi(c);
+		p[counter]=number;
+		counter++;
+		if(counter>acceptNumber){
+			p=realloc(p,sizeof(int)*acceptNumber+counter2);
+			counter2++;
+		}
+		free(c);
+		c=NULL;
+
+	}
+
+	return p;
 
 }
