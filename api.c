@@ -19,7 +19,7 @@ typedef struct T{
 
 Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
-void scantr();
+void phantomScan();
 void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
@@ -36,9 +36,10 @@ int main() {
     int numberOfStates=0;
     int numberofAcceptStates=0;
     int i=0;
+    int long numpassi=0;
 
     //Stringa usata per scartare il tr
-    scantr();
+    phantomScan();
     
     do{
         //Ricevo puntatore alla transition creata
@@ -95,6 +96,10 @@ int main() {
     printf("Numero di stati di accettazione: %d\n", numberofAcceptStates);
     for(i=0;i<numberofAcceptStates;i++)
         printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
+    scanf("%d", &numpassi);
+    phantomScan();
+
+
 
     return 0;
 }
@@ -177,7 +182,7 @@ Transition *acquireTransition(){
 int calculateHashMap(int stateNumber){
     return stateNumber%256;
 }
-void scantr(){
+void phantomScan(){
     char phantomString[10];
     scanf("%s", phantomString);
     printf("%s\n", phantomString);
