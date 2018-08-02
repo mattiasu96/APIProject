@@ -32,9 +32,10 @@ int main() {
 	int tempchar;
 	int hashmapIndex;
 	Transition *p=NULL;
-	//int *acceptStates=NULL;
+	int *acceptStates=NULL;
 	int numberOfStates=0;
-	//int numberofAcceptStates=0;
+	int numberofAcceptStates=0;
+	int i=0;
 
 	//Stringa usata per scartare il tr
 	scantr();
@@ -90,7 +91,10 @@ int main() {
 	free(temporaryTransition);
 
 
-	//acceptStates = acquireAcceptStates(&numberofAcceptStates);
+	acceptStates = acquireAcceptStates(&numberofAcceptStates);
+	printf("Numero di stati di accettazione: %d\n", numberofAcceptStates);
+	for(i=0;i<numberofAcceptStates;i++)
+		printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
 
 	return 0;
 }
@@ -208,7 +212,6 @@ int *acquireAcceptStates(int *NacceptState){
 	int counter=0;
 	char *c=NULL;
 	int *p2=NULL;
-	int singleton=0;
 
 
 	while(c==NULL || strcmp(c,"max")!=0){
@@ -220,30 +223,22 @@ int *acquireAcceptStates(int *NacceptState){
 		}
 		scanf("%ms", &c);
 		if(strcmp(c,"max")!=0){
-			if(singleton==0){
-			 p=malloc(sizeof(int));
-			 singleton++;
-
-			}
-			p[counter]=atoi(c);
 			counter++;
-			p2 = realloc(p,sizeof(int)+counter);
-			if(p2!=NULL)
+			p2 = (int *)realloc(p,sizeof(int)*counter);
+			if(p2!=NULL){
 				p=p2;
+				p[counter-1]=atoi(c);
+			}
 			else 
 				printf("Errore nella realloc\n");
+			
+			
 	}
 
 	}
 	if(c){
 		free(c);
-
 	}
-	p2 = realloc(p,sizeof(int)+(counter-1));
-	if(p2!=NULL)
-		p=p2;
-	else 
-		printf("Errore nella seconda realloc\n");
 	*NacceptState = counter;
 
 

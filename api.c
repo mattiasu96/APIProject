@@ -5,11 +5,12 @@
 
 #define MAX 5
 #define SIZE 256
+#define acceptNumber 5
 typedef struct T{
     int startState;
     char readInput;
     char writeOutput;
-    char shiftTape;
+    int shiftTape;
     int nextState;
     struct T *prox;
 
@@ -20,6 +21,8 @@ Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
 void scantr();
 void inserisciCoda(Transition *element,Transition *position);
+int checkMaxStates(Transition *element, int currentMax);
+int *acquireAcceptStates(int *NacceptState);
 
 
 
@@ -29,6 +32,10 @@ int main() {
     int tempchar;
     int hashmapIndex;
     Transition *p=NULL;
+    int *acceptStates=NULL;
+    int numberOfStates=0;
+    int numberofAcceptStates=0;
+    int i=0;
 
     //Stringa usata per scartare il tr
     scantr();
@@ -37,11 +44,14 @@ int main() {
         //Ricevo puntatore alla transition creata
         temporaryTransition = acquireTransition();
         if(temporaryTransition->startState!= -1){
+            printf("%d", temporaryTransition->startState);
             printf("%c", temporaryTransition->readInput);
             printf("%c", temporaryTransition->writeOutput);
-            printf("%c", temporaryTransition->shiftTape);
+            printf("%d", temporaryTransition->shiftTape);
             printf("%d\n", temporaryTransition->nextState);
 
+            numberOfStates = checkMaxStates(temporaryTransition, numberOfStates);
+            printf("Printo numero di stati max: %d\n", numberOfStates);
             //Fast check of conversion from ASCII to number, in order to insert in the right index
             tempchar = (int) temporaryTransition->readInput;
             printf("%d\n", tempchar);
@@ -81,7 +91,10 @@ int main() {
     free(temporaryTransition);
 
 
-    
+    acceptStates = acquireAcceptStates(&numberofAcceptStates);
+    printf("Numero di stati di accettazione: %d\n", numberofAcceptStates);
+    for(i=0;i<numberofAcceptStates;i++)
+        printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
 
     return 0;
 }
@@ -91,6 +104,7 @@ Transition *acquireTransition(){
     char *start = NULL;
     char *end = NULL;
     char in, out, shift;
+    int shiftInt;
     int firstState;
     int secondState;
 
@@ -125,7 +139,19 @@ Transition *acquireTransition(){
             transition->startState = firstState;
             transition->readInput = in;
             transition->writeOutput = out;
-            transition->shiftTape = shift;
+            switch (shift){
+                case 'L':
+                    shiftInt = -1;
+                    break;
+                case 'S':
+                    shiftInt = 0;
+                    break;
+                case 'R':
+                    shiftInt = 1;
+                    break;
+            }
+            printf("Valore di shift int: %d\n", shiftInt);
+            transition->shiftTape = shiftInt;
             transition->nextState = secondState;
             transition->prox = NULL;
 
@@ -165,5 +191,58 @@ void inserisciCoda(Transition *element,Transition *position){
     }
     scanner->prox = element;
 
+
+}
+
+int checkMaxStates(Transition *element,int currentMax){
+    int max=currentMax;
+
+    if(max<element->startState)
+        max = element->startState;
+    if(max<element->nextState)
+        max = element->nextState;
+
+    return max;
+
+
+}
+// CONTROLLARE CHE FUNZIONI CORRETTAMENTE
+int *acquireAcceptStates(int *NacceptState){
+    int *p=NULL;
+    int counter=0;
+    char *c=NULL;
+    int *p2=NULL;
+
+
+    while(c==NULL || strcmp(c,"max")!=0){
+        
+
+        if(c){
+            free(c);
+            c=NULL;
+        }
+        scanf("%ms", &c);
+        if(strcmp(c,"max")!=0){
+            counter++;
+            p2 = (int *)realloc(p,sizeof(int)*counter);
+            if(p2!=NULL){
+                p=p2;
+                p[counter-1]=atoi(c);
+            }
+            else 
+                printf("Errore nella realloc\n");
+            
+            
+    }
+
+    }
+    if(c){
+        free(c);
+    }
+    *NacceptState = counter;
+
+
+
+    return p;
 
 }
