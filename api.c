@@ -36,7 +36,7 @@ int main() {
     int numberOfStates=0;
     int numberofAcceptStates=0;
     int i=0;
-    int long numpassi=0;
+    int long unsigned numpassi=0;
 
     //Stringa usata per scartare il tr
     phantomScan();
@@ -96,7 +96,9 @@ int main() {
     printf("Numero di stati di accettazione: %d\n", numberofAcceptStates);
     for(i=0;i<numberofAcceptStates;i++)
         printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
+    
     scanf("%d", &numpassi);
+    printf("%d", numpassi);
     phantomScan();
 
 
