@@ -17,6 +17,19 @@ typedef struct T{
 
 } Transition;
 
+typedef struct tape{
+    char *content;
+    struct tape *prox;
+
+} inputTape;
+// Controlla Strlen come funzione, potrebbe essere utile
+typedef struct turing{
+    int currentState;
+    int tapeHead;
+    inputTape *myTape;
+    struct turing *prox;
+} TM;
+
 Transition *acquireTransition();
 int calculateHashMap(int stateNumber);
 void phantomScan();
@@ -36,7 +49,7 @@ int main() {
     int numberOfStates=0;
     int numberofAcceptStates=0;
     int i=0;
-    int long unsigned numpassi=0;
+    unsigned long int numpassi=0;
 
     //Stringa usata per scartare il tr
     phantomScan();
@@ -97,9 +110,10 @@ int main() {
     for(i=0;i<numberofAcceptStates;i++)
         printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
     
-    scanf("%d", &numpassi);
-    printf("%d", numpassi);
+    scanf("%lu", &numpassi);
+    printf("%lu", numpassi);
     phantomScan();
+    free(acceptStates);
 
 
 
