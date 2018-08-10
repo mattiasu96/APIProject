@@ -44,14 +44,14 @@ int main() {
     Transition *temporaryTransition=NULL;
     Transition ***inputStatesArray = {NULL};
     Transition ***check = {NULL};
-
+    int maxInputSize;
     int tempchar;
     int tempstate;
     Transition *p=NULL;
     int *acceptStates=NULL;
     int maxInputState=0;
     int numberofAcceptStates=0;
-    int currentSize=10;
+    int currentIndex=MAX;
 	int i=0;
     unsigned long int numpassi=0;
 
@@ -59,8 +59,8 @@ int main() {
     phantomScan();
 
     
-    inputStatesArray= malloc(sizeof(Transition**)*currentSize);
-    for (int i = 0; i < currentSize; ++i)
+    inputStatesArray = malloc(sizeof(Transition**)*MAX);
+    for (int i = 0; i < currentIndex; ++i)
     {
   		inputStatesArray[i]=NULL;
   		printf("%p",inputStatesArray[i] );
@@ -77,34 +77,40 @@ int main() {
             printf("%d\n", temporaryTransition->nextState);
 
             maxInputState = checkMaxStates(temporaryTransition, maxInputState);
+            maxInputSize= maxInputState+1;
             printf("Printo numero di stati max: %d\n", maxInputState);
+            printf("Printo dimensiona massima di stati di ingresso di stati max: %d\n", maxInputSize);
+
             //Fast check of conversion from ASCII to number, in order to insert in the right index
             tempchar = (int) temporaryTransition->readInput;
+            // FORSE QUA DEVO CAMBIARE GLI ORDINI, POTREBBE ESSER QUI IL PROBLEMA
             tempstate = temporaryTransition ->startState;
             printf("%d\n",tempstate);
             printf("%d\n", tempchar);
-
-            if(maxInputState>currentSize){
-            	check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputState+1));
+            //ERRORE QUI
+            if(maxInputSize>currentIndex){
+            	printf("Sto reallocando\n");
+            	check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputSize));
+            	//FIN QUI HA SENSO
             	if(check!=NULL)
             		inputStatesArray=check;
             	printf("Prima ciclo if\n");
-
-            	for(i=currentSize;i<maxInputState;i++){
+            	//FORSE ALTRO BUG QUI, NON INIZIALIZZO L'ULTIMO!!
+            	for(i=currentIndex;i<maxInputSize;i++){
             		printf("Metto a null\n");
-
-            		inputStatesArray[i]=NULL;
+					inputStatesArray[i]=NULL;
             	}
-            	currentSize=maxInputState;
+            	currentIndex=maxInputSize;
             	printf("Dopo ciclo if\n");
 
 
             }
-            for (int i = 0; i < currentSize; ++i)
+            for (int i = 0; i < currentIndex; ++i)
     		{
-  				printf("%p",inputStatesArray[i] );
+  				printf("%p ",inputStatesArray[i] );
     		}
-    		// ERRORE NEGLI INDICI, SE METTO LO STATO 15, L'ARRAY INDICIZZA DA 0
+            printf("Prima dell'errore Puntaotre a: %p\n",inputStatesArray[tempstate] );
+
             if(inputStatesArray[tempstate]==NULL){
             	printf("Dentro if calloc\n");
 
@@ -116,13 +122,15 @@ int main() {
 
 
             
-            
+            printf("Printo valore del puntatore: %p\n", inputStatesArray[tempstate][tempchar]);
             if(inputStatesArray[tempstate][tempchar]==0){
 
                 inputStatesArray[tempstate][tempchar]=temporaryTransition;
             }
             else{
-                //Inserire elemento nella coda e scompare anche l'errore di memoria
+ 				 // BUG QUI
+                 printf("Possibile bug nell'accodamento?\n");
+
                 inserisciCoda(temporaryTransition,inputStatesArray[tempstate][tempchar]);
                 printf("Elemento già inserito in questa posizione: sto accodando\n");
             }
