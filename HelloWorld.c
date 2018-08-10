@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-#define MAX 5
+#define MAX 10
 #define ASCII 256
 #define acceptNumber 5
 typedef struct T{

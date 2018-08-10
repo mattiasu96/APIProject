@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 
-#define MAX 5
-#define SIZE 256
+#define MAX 10
+#define ASCII 256
 #define acceptNumber 5
 typedef struct T{
     int startState;
@@ -18,20 +18,21 @@ typedef struct T{
 } Transition;
 
 typedef struct tape{
-    char *content;
+    char *contentRight;
+    char *contentLeft;
     struct tape *prox;
 
 } inputTape;
 // Controlla Strlen come funzione, potrebbe essere utile
 typedef struct turing{
     int currentState;
-    int tapeHead;
+    int tapePosition;
+    char subtapeType;
     inputTape *myTape;
     struct turing *prox;
 } TM;
 
 Transition *acquireTransition();
-int calculateHashMap(int stateNumber);
 void phantomScan();
 void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
@@ -41,19 +42,30 @@ int *acquireAcceptStates(int *NacceptState);
 
 int main() {
     Transition *temporaryTransition=NULL;
-    Transition **inputCharacters[256] = {NULL};
+    Transition ***inputStatesArray = {NULL};
+    Transition ***check = {NULL};
+    int maxInputSize;
     int tempchar;
-    int hashmapIndex;
+    int tempstate;
     Transition *p=NULL;
     int *acceptStates=NULL;
-    int numberOfStates=0;
+    int maxInputState=0;
     int numberofAcceptStates=0;
+    int currentIndex=MAX;
     int i=0;
     unsigned long int numpassi=0;
 
     //Stringa usata per scartare il tr
     phantomScan();
+
     
+    inputStatesArray = malloc(sizeof(Transition**)*MAX);
+    for (int i = 0; i < currentIndex; ++i)
+    {
+        inputStatesArray[i]=NULL;
+        printf("%p",inputStatesArray[i] );
+    }
+            
     do{
         //Ricevo puntatore alla transition creata
         temporaryTransition = acquireTransition();
@@ -64,39 +76,75 @@ int main() {
             printf("%d", temporaryTransition->shiftTape);
             printf("%d\n", temporaryTransition->nextState);
 
-            numberOfStates = checkMaxStates(temporaryTransition, numberOfStates);
-            printf("Printo numero di stati max: %d\n", numberOfStates);
+            maxInputState = checkMaxStates(temporaryTransition, maxInputState);
+            maxInputSize= maxInputState+1;
+            printf("Printo numero di stati max: %d\n", maxInputState);
+            printf("Printo dimensiona massima di stati di ingresso di stati max: %d\n", maxInputSize);
+
             //Fast check of conversion from ASCII to number, in order to insert in the right index
             tempchar = (int) temporaryTransition->readInput;
+            // FORSE QUA DEVO CAMBIARE GLI ORDINI, POTREBBE ESSER QUI IL PROBLEMA
+            tempstate = temporaryTransition ->startState;
+            printf("%d\n",tempstate);
             printf("%d\n", tempchar);
+            //ERRORE QUI
+            if(maxInputSize>currentIndex){
+                printf("Sto reallocando\n");
+                check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputSize));
+                //FIN QUI HA SENSO
+                if(check!=NULL)
+                    inputStatesArray=check;
+                printf("Prima ciclo if\n");
+                //FORSE ALTRO BUG QUI, NON INIZIALIZZO L'ULTIMO!!
+                for(i=currentIndex;i<maxInputSize;i++){
+                    printf("Metto a null\n");
+                    inputStatesArray[i]=NULL;
+                }
+                currentIndex=maxInputSize;
+                printf("Dopo ciclo if\n");
 
-            //Creo un singolo puntatore dello stesso di inputCharacters e gli alloco la hashmap
-            
-            if(inputCharacters[tempchar]==NULL){
-                inputCharacters[tempchar]=(Transition **)calloc(SIZE,sizeof(Transition*));;
+
             }
+            for (int i = 0; i < currentIndex; ++i)
+            {
+                printf("%p ",inputStatesArray[i] );
+            }
+            printf("Prima dell'errore Puntaotre a: %p\n",inputStatesArray[tempstate] );
+
+            if(inputStatesArray[tempstate]==NULL){
+                printf("Dentro if calloc\n");
+
+                inputStatesArray[tempstate] = calloc(ASCII,sizeof(Transition*));
+
+            }
+            printf("Dopo Check if\n");
+            printf("Puntaotre a: %p\n",inputStatesArray[tempstate] );
+
+
             
-            hashmapIndex = calculateHashMap(temporaryTransition->startState);
-            if(inputCharacters[tempchar][hashmapIndex]==0){
-                inputCharacters[tempchar][hashmapIndex]=temporaryTransition;
+            printf("Printo valore del puntatore: %p\n", inputStatesArray[tempstate][tempchar]);
+            if(inputStatesArray[tempstate][tempchar]==0){
+
+                inputStatesArray[tempstate][tempchar]=temporaryTransition;
             }
             else{
-                //Inserire elemento nella coda e scompare anche l'errore di memoria
-                inserisciCoda(temporaryTransition,inputCharacters[tempchar][hashmapIndex]);
+                 // BUG QUI
+                 printf("Possibile bug nell'accodamento?\n");
+
+                inserisciCoda(temporaryTransition,inputStatesArray[tempstate][tempchar]);
                 printf("Elemento già inserito in questa posizione: sto accodando\n");
             }
-            printf("printo valore dell'hashmap index: %d\n", hashmapIndex);
             
             printf("Prima del test\n");
-            p=inputCharacters[tempchar][hashmapIndex];
+            p=inputStatesArray[tempstate][tempchar];
             while (p->prox!=NULL){
                 
-                printf("Printo valore in inputCharacters: %d\n",p->startState); 
-                printf("Printo valore in inputCharacters: %c\n",p->writeOutput);    
+                printf("Printo valore in inputStatesArray: %d\n",p->startState); 
+                printf("Printo valore in inputStatesArray: %c\n",p->writeOutput);    
                 p = p-> prox;   
             } 
             
-            
+
         
 
         }
@@ -113,7 +161,10 @@ int main() {
     scanf("%lu", &numpassi);
     printf("%lu", numpassi);
     phantomScan();
-    free(acceptStates);
+    /*free(acceptStates);
+    free(inputStatesArray[15][97]);
+    free(inputStatesArray[15]);
+    free(inputStatesArray);*/
 
 
 
@@ -194,10 +245,6 @@ Transition *acquireTransition(){
     return transition;
 }
 
-
-int calculateHashMap(int stateNumber){
-    return stateNumber%256;
-}
 void phantomScan(){
     char phantomString[10];
     scanf("%s", phantomString);
@@ -220,8 +267,7 @@ int checkMaxStates(Transition *element,int currentMax){
 
     if(max<element->startState)
         max = element->startState;
-    if(max<element->nextState)
-        max = element->nextState;
+    
 
     return max;
 
