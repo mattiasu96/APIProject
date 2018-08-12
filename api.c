@@ -17,18 +17,14 @@ typedef struct T{
 
 } Transition;
 
-typedef struct tape{
-    char *contentRight;
-    char *contentLeft;
-    struct tape *prox;
 
-} inputTape;
 // Controlla Strlen come funzione, potrebbe essere utile
 typedef struct turing{
     int currentState;
     int tapePosition;
     char subtapeType;
-    inputTape *myTape;
+    char *contentRight;
+    char *contentLeft;
     struct turing *prox;
 } TM;
 
@@ -47,7 +43,6 @@ int main() {
     int maxInputSize;
     int tempchar;
     int tempstate;
-    Transition *p=NULL;
     int *acceptStates=NULL;
     int maxInputState=0;
     int numberofAcceptStates=0;
@@ -70,83 +65,41 @@ int main() {
         //Ricevo puntatore alla transition creata
         temporaryTransition = acquireTransition();
         if(temporaryTransition->startState!= -1){
-            printf("%d", temporaryTransition->startState);
-            printf("%c", temporaryTransition->readInput);
-            printf("%c", temporaryTransition->writeOutput);
-            printf("%d", temporaryTransition->shiftTape);
-            printf("%d\n", temporaryTransition->nextState);
 
             maxInputState = checkMaxStates(temporaryTransition, maxInputState);
             maxInputSize= maxInputState+1;
-            printf("Printo numero di stati max: %d\n", maxInputState);
-            printf("Printo dimensiona massima di stati di ingresso di stati max: %d\n", maxInputSize);
-
-            //Fast check of conversion from ASCII to number, in order to insert in the right index
+            
             tempchar = (int) temporaryTransition->readInput;
-            // FORSE QUA DEVO CAMBIARE GLI ORDINI, POTREBBE ESSER QUI IL PROBLEMA
             tempstate = temporaryTransition ->startState;
-            printf("%d\n",tempstate);
-            printf("%d\n", tempchar);
-            //ERRORE QUI
+       
             if(maxInputSize>currentIndex){
                 printf("Sto reallocando\n");
                 check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputSize));
-                //FIN QUI HA SENSO
                 if(check!=NULL)
                     inputStatesArray=check;
-                printf("Prima ciclo if\n");
-                //FORSE ALTRO BUG QUI, NON INIZIALIZZO L'ULTIMO!!
+             
                 for(i=currentIndex;i<maxInputSize;i++){
-                    printf("Metto a null\n");
                     inputStatesArray[i]=NULL;
                 }
                 currentIndex=maxInputSize;
-                printf("Dopo ciclo if\n");
 
 
             }
-            for (int i = 0; i < currentIndex; ++i)
-            {
-                printf("%p ",inputStatesArray[i] );
-            }
-            printf("Prima dell'errore Puntaotre a: %p\n",inputStatesArray[tempstate] );
+            
 
             if(inputStatesArray[tempstate]==NULL){
-                printf("Dentro if calloc\n");
 
                 inputStatesArray[tempstate] = calloc(ASCII,sizeof(Transition*));
 
             }
-            printf("Dopo Check if\n");
-            printf("Puntaotre a: %p\n",inputStatesArray[tempstate] );
-
-
-            
-            printf("Printo valore del puntatore: %p\n", inputStatesArray[tempstate][tempchar]);
+           
             if(inputStatesArray[tempstate][tempchar]==0){
-
                 inputStatesArray[tempstate][tempchar]=temporaryTransition;
             }
             else{
-                 // BUG QUI
-                 printf("Possibile bug nell'accodamento?\n");
-
                 inserisciCoda(temporaryTransition,inputStatesArray[tempstate][tempchar]);
-                printf("Elemento già inserito in questa posizione: sto accodando\n");
             }
             
-            printf("Prima del test\n");
-            p=inputStatesArray[tempstate][tempchar];
-            while (p->prox!=NULL){
-                
-                printf("Printo valore in inputStatesArray: %d\n",p->startState); 
-                printf("Printo valore in inputStatesArray: %c\n",p->writeOutput);    
-                p = p-> prox;   
-            } 
-            
-
-        
-
         }
 
     }while(temporaryTransition->startState!= -1);

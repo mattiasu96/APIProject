@@ -5,7 +5,6 @@
 
 #define MAX 10
 #define ASCII 256
-#define acceptNumber 5
 typedef struct T{
     int startState;
     char readInput;
@@ -17,18 +16,15 @@ typedef struct T{
 
 } Transition;
 
-typedef struct tape{
-	char *contentRight;
-	char *contentLeft;
-	struct tape *prox;
 
-} inputTape;
 // Controlla Strlen come funzione, potrebbe essere utile
 typedef struct turing{
 	int currentState;
 	int tapePosition;
+	int remainingSteps;
 	char subtapeType;
-	inputTape *myTape;
+	char *contentRight;
+	char *contentLeft;
 	struct turing *prox;
 } TM;
 
@@ -37,10 +33,15 @@ void phantomScan();
 void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
+TM *initializeSimulation(char *tape, int numberOfSteps);
 
 
 
 int main() {
+	char *inputTape;
+	TM *headTM=NULL;
+	TM *taleTM=NULL;
+	//TM *scannerTM=NULL;
     Transition *temporaryTransition=NULL;
     Transition ***inputStatesArray = {NULL};
     Transition ***check = {NULL};
@@ -161,10 +162,22 @@ int main() {
     scanf("%lu", &numpassi);
     printf("%lu", numpassi);
     phantomScan();
-    /*free(acceptStates);
-    free(inputStatesArray[15][97]);
-    free(inputStatesArray[15]);
-    free(inputStatesArray);*/
+    
+    //INIZIO PARTE DI SIMULAZIONE 
+    while(scanf("%ms",&inputTape)!=EOF){
+    	printf("%s\n",inputTape);
+    	printf("%ld\n", strlen(inputTape));
+    	headTM = initializeSimulation(inputTape,numpassi);
+    	printf("Stato iniziale: %d\n",headTM->currentState);
+    	taleTM =headTM;
+    	
+		free(inputTape);
+		free(headTM->contentRight);
+		free(headTM);
+
+    }
+
+
 
 
 
@@ -313,3 +326,20 @@ int *acquireAcceptStates(int *NacceptState){
     return p;
 
 }
+
+TM *initializeSimulation(char *tape, int numberOfSteps){
+	TM *p=NULL;
+	p=malloc(sizeof(TM));
+	p->currentState=0;
+	p->tapePosition=0;
+	p->remainingSteps=numberOfSteps;
+	p->subtapeType='R';
+	p->contentLeft=NULL;
+	p->contentRight=malloc(sizeof(char)*(strlen(tape)+1));
+	p->contentRight[0]='\0';
+	strcpy(p->contentRight,tape);
+	printf("Printo contenuto di contentRight: %s\n",p->contentRight);
+	p->prox=NULL;
+	return p;
+}
+
