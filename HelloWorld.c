@@ -35,6 +35,7 @@ int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape, int numberOfSteps);
 void simulation(TM *testa, Transition ***transizioni);
+Transition *transitionEntryPoint(TM *scanner, Transition ***transizioni);
 
 
 
@@ -289,7 +290,6 @@ int checkMaxStates(Transition *element,int currentMax){
 
 
 }
-// CONTROLLARE CHE FUNZIONI CORRETTAMENTE
 int *acquireAcceptStates(int *NacceptState){
     int *p=NULL;
     int counter=0;
@@ -349,16 +349,14 @@ TM *initializeSimulation(char *tape, int numberOfSteps){
 void simulation(TM *testa, Transition ***transizioni){
 	TM *scanner=testa;
 	Transition *scannerTransition=NULL;
-	int state=0;
-	int readChar;
-	int tempTestina=0;
+	// QUI ITERO SULLA CODA 
 	while(scanner!=NULL){
-		//state = scanner->currentState;
-		tempTestina= scanner-> tapePosition;
-		readChar =(int) scanner-> contentRight[tempTestina];
-		printf("Printo valore del carattere letto: %d\n",readChar);
-		scannerTransition= transizioni[state][readChar];
+		
+		//Prendo l'entry point
+		scannerTransition= transitionEntryPoint(scanner,transizioni);
 	    printf("Pinto valore stato prossimo: %d\n", scannerTransition->nextState);
+		//QUI DEVO INSERIRE SCORRIMENTO DI SCANNERTRANSITION E COPIA NODI IN CASO DI NON DETERMINISMO
+
 		scanner=scanner->prox;
 
  	}
@@ -366,3 +364,13 @@ void simulation(TM *testa, Transition ***transizioni){
 }
 
 
+Transition *transitionEntryPoint(TM *scanner, Transition ***transizioni){
+	Transition *p=NULL;
+	int tempTestina= scanner-> tapePosition;
+	int readChar =(int) scanner-> contentRight[tempTestina];
+	int state = scanner -> currentState;
+	p=transizioni[state][readChar];
+	return p;
+
+
+}
