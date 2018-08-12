@@ -4,7 +4,7 @@
 
 
 #define MAX 10
-#define ASCII 256
+#define ASCII 128
 typedef struct T{
     int startState;
     char readInput;
@@ -34,13 +34,14 @@ void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape, int numberOfSteps);
+void simulation(TM *testa, Transition ***transizioni);
 
 
 
 int main() {
 	char *inputTape;
 	TM *headTM=NULL;
-	TM *taleTM=NULL;
+	//TM *taleTM=NULL;
 	//TM *scannerTM=NULL;
     Transition *temporaryTransition=NULL;
     Transition ***inputStatesArray = {NULL};
@@ -167,13 +168,15 @@ int main() {
     while(scanf("%ms",&inputTape)!=EOF){
     	printf("%s\n",inputTape);
     	printf("%ld\n", strlen(inputTape));
+    	//INIZIALIZZAZIONE
     	headTM = initializeSimulation(inputTape,numpassi);
     	printf("Stato iniziale: %d\n",headTM->currentState);
-    	taleTM =headTM;
-    	
+    	//taleTM = headTM;
 		free(inputTape);
-		free(headTM->contentRight);
-		free(headTM);
+		
+		simulation(headTM, inputStatesArray);
+
+
 
     }
 
@@ -342,4 +345,24 @@ TM *initializeSimulation(char *tape, int numberOfSteps){
 	p->prox=NULL;
 	return p;
 }
+
+void simulation(TM *testa, Transition ***transizioni){
+	TM *scanner=testa;
+	Transition *scannerTransition=NULL;
+	int state=0;
+	int readChar;
+	int tempTestina=0;
+	while(scanner!=NULL){
+		//state = scanner->currentState;
+		tempTestina= scanner-> tapePosition;
+		readChar =(int) scanner-> contentRight[tempTestina];
+		printf("Printo valore del carattere letto: %d\n",readChar);
+		scannerTransition= transizioni[state][readChar];
+	    printf("Pinto valore stato prossimo: %d\n", scannerTransition->nextState);
+		scanner=scanner->prox;
+
+ 	}
+
+}
+
 
