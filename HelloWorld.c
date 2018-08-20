@@ -20,12 +20,11 @@ typedef struct T{
 // Controlla Strlen come funzione, potrebbe essere utile
 typedef struct turing{
 	int currentState;
+	int tapesize;
 	int tapePosition;
-	int remainingSteps;
-	char subtapeType;
-	char *contentRight;
-	char *contentLeft;
+	char *tape;
 	struct turing *prox;
+	struct turing *prec;
 } TM;
 
 Transition *acquireTransition();
@@ -35,16 +34,15 @@ int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape, int numberOfSteps);
 void simulation(TM *testa, Transition ***transizioni);
-Transition *transitionEntryPoint(TM *scanner, Transition ***transizioni);
 
 
 
 int main() {
 	char *inputTape;
 	TM *headTM=NULL;
-	//TM *taleTM=NULL;
-	//TM *scannerTM=NULL;
-    Transition *temporaryTransition=NULL;
+	TM *scannerTM=NULL;
+	TM *newTM=NULL;
+	Transition *temporaryTransition=NULL;
     Transition ***inputStatesArray = {NULL};
     Transition ***check = {NULL};
     int maxInputSize;
@@ -56,7 +54,8 @@ int main() {
     int numberofAcceptStates=0;
     int currentIndex=MAX;
 	int i=0;
-    unsigned long int numpassi=0;
+    unsigned int numpassi=0;
+    //unsigned int counterPassi=0;
 
     //Stringa usata per scartare il tr
     phantomScan();
@@ -161,21 +160,59 @@ int main() {
     for(i=0;i<numberofAcceptStates;i++)
         printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
     
-    scanf("%lu", &numpassi);
-    printf("%lu", numpassi);
+    scanf("%u", &numpassi);
+    printf("%u", numpassi);
     phantomScan();
+
     
     //INIZIO PARTE DI SIMULAZIONE 
     while(scanf("%ms",&inputTape)!=EOF){
-    	printf("%s\n",inputTape);
+    	printf("Tape originale: %s\n",inputTape);
     	printf("%ld\n", strlen(inputTape));
     	//INIZIALIZZAZIONE
     	headTM = initializeSimulation(inputTape,numpassi);
     	printf("Stato iniziale: %d\n",headTM->currentState);
-    	//taleTM = headTM;
+    	printf("Printo contenuto del tape copiato:%s\n",headTM->tape);
+    	printf("Dimensioni del mio array: %d\n", headTM->tapesize);
 		free(inputTape);
-		
-		simulation(headTM, inputStatesArray);
+
+		//SIMULAZIONE
+		scannerTM=headTM;
+		//Qui itero sulla lista di TM
+		while(scannerTM!=NULL){
+			tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
+			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
+			if(scannerTM->currentState<=maxInputState && inputStatesArray[scannerTM->currentState]!=NULL && inputStatesArray[scannerTM->currentState][tempchar]!=NULL){
+				p=inputStatesArray[scannerTM->currentState][tempchar];
+				printf("Stato prossimo della prima transizione letta %d\n", p->nextState);
+				while(p->prox!=NULL){
+					newTM = malloc(sizeof(TM));
+					//Inserisco i valori
+					newTM->currentState = p->nextState;
+					newTM->tape[newTM->tapePosition] = p->writeOutput;
+					//Qui è da inserire il check per la realloc
+					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
+					//Ora devo inserire in testa la nuova copia
+					newTM->prox = headTM;
+					newTM->prec =NULL;
+					headTM->prec = newTM;
+					headTM = newTM;
+					p=p->prox;
+					}
+					//Inserisco i valori
+					scannerTM->currentState = p->nextState;
+					scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
+					//Qui è da inserire il check per la realloc
+					scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
+					//Ora devo inserire in testa la nuova copia
+					p=NULL;
+
+
+			}
+
+
+		}
+
 
 
 
@@ -335,42 +372,14 @@ TM *initializeSimulation(char *tape, int numberOfSteps){
 	p=malloc(sizeof(TM));
 	p->currentState=0;
 	p->tapePosition=0;
-	p->remainingSteps=numberOfSteps;
-	p->subtapeType='R';
-	p->contentLeft=NULL;
-	p->contentRight=malloc(sizeof(char)*(strlen(tape)+1));
-	p->contentRight[0]='\0';
-	strcpy(p->contentRight,tape);
-	printf("Printo contenuto di contentRight: %s\n",p->contentRight);
+	p->tapesize=strlen(tape)+1;
+	p->tape=malloc(sizeof(char)*(p->tapesize));
+	//Inserire memcpy
+	strcpy(p->tape,tape);
 	p->prox=NULL;
+	p->prec=NULL;
 	return p;
 }
 
-void simulation(TM *testa, Transition ***transizioni){
-	TM *scanner=testa;
-	Transition *scannerTransition=NULL;
-	// QUI ITERO SULLA CODA 
-	while(scanner!=NULL){
-		
-		//Prendo l'entry point
-		scannerTransition= transitionEntryPoint(scanner,transizioni);
-	    printf("Pinto valore stato prossimo: %d\n", scannerTransition->nextState);
-		//QUI DEVO INSERIRE SCORRIMENTO DI SCANNERTRANSITION E COPIA NODI IN CASO DI NON DETERMINISMO
-
-		scanner=scanner->prox;
-
- 	}
-
-}
 
 
-Transition *transitionEntryPoint(TM *scanner, Transition ***transizioni){
-	Transition *p=NULL;
-	int tempTestina= scanner-> tapePosition;
-	int readChar =(int) scanner-> contentRight[tempTestina];
-	int state = scanner -> currentState;
-	p=transizioni[state][readChar];
-	return p;
-
-
-}
