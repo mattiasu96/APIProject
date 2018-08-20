@@ -33,7 +33,8 @@ void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape, int numberOfSteps);
-void simulation(TM *testa, Transition ***transizioni);
+TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState);
+
 
 
 
@@ -179,6 +180,10 @@ int main() {
 		//SIMULAZIONE
 		scannerTM=headTM;
 		//Qui itero sulla lista di TM
+		//QUESTA ROBA POSSO FICCARLA IN UNA FUNZIONE A PARTE
+
+		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
+		headTM = iterateListTM(headTM,inputStatesArray,maxInputState);
 		while(scannerTM!=NULL){
 			tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
@@ -208,11 +213,15 @@ int main() {
 					p=NULL;
 
 
-			}
+			}else {
+				//QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
+				//POI E' DA GESTIRE LA FREE E RICONCATENAMENTO
 
+			}
+			scannerTM=scannerTM->prox;
 
 		}
-
+		//INSERIRE INCREMENTO CONTATORE 
 
 
 
@@ -382,4 +391,50 @@ TM *initializeSimulation(char *tape, int numberOfSteps){
 }
 
 
+TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
+	TM *scannerTM = NULL;
+	TM *newTM = NULL;
+	scannerTM =headTM;
+	Transition *p=NULL;
+	while(scannerTM!=NULL){
+			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
+			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
+			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
+				p=transizioni[scannerTM->currentState][tempchar];
+				printf("Stato prossimo della prima transizione letta %d\n", p->nextState);
+				while(p->prox!=NULL){
+					newTM = malloc(sizeof(TM));
+					//Inserisco i valori
+					newTM->currentState = p->nextState;
+					newTM->tape[newTM->tapePosition] = p->writeOutput;
+					//Qui è da inserire il check per la realloc
+					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
+					//Ora devo inserire in testa la nuova copia
+					newTM->prox = headTM;
+					newTM->prec =NULL;
+					headTM->prec = newTM;
+					headTM = newTM;
+					p=p->prox;
+					}
+					//Inserisco i valori
+					scannerTM->currentState = p->nextState;
+					scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
+					//Qui è da inserire il check per la realloc
+					scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
+					//Ora devo inserire in testa la nuova copia
+					p=NULL;
 
+
+			}else {
+				//QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
+				//POI E' DA GESTIRE LA FREE E RICONCATENAMENTO
+
+			}
+			scannerTM=scannerTM->prox;
+
+		}
+
+
+
+	return headTM;
+}
