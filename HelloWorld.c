@@ -32,7 +32,7 @@ void phantomScan();
 void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
-TM *initializeSimulation(char *tape, int numberOfSteps);
+TM *initializeSimulation(char *tape);
 TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState);
 
 
@@ -169,7 +169,7 @@ int main() {
     	printf("Tape originale: %s\n",inputTape);
     	printf("%ld\n", strlen(inputTape));
     	//INIZIALIZZAZIONE
-    	headTM = initializeSimulation(inputTape,numpassi);
+    	headTM = initializeSimulation(inputTape);
     	printf("Stato iniziale: %d\n",headTM->currentState);
     	printf("Printo contenuto del tape copiato:%s\n",headTM->tape);
     	printf("Dimensioni del mio array: %d\n", headTM->tapesize);
@@ -337,7 +337,7 @@ int *acquireAcceptStates(int *NacceptState){
 
 }
 
-TM *initializeSimulation(char *tape, int numberOfSteps){
+TM *initializeSimulation(char *tape){
 	TM *p=NULL;
 	p=malloc(sizeof(TM));
 	p->currentState=0;
@@ -367,7 +367,11 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 					newTM = malloc(sizeof(TM));
 					//Inserisco i valori
 					newTM->currentState = p->nextState;
+					//QUI COPIO LA STRINGA
+					newTM->tape=malloc(sizeof(char)*scannerTM->tapesize);
+					memcpy(newTM->tape,scannerTM->tape,scannerTM->tapesize);
 					newTM->tape[newTM->tapePosition] = p->writeOutput;
+
 					//Qui è da inserire il check per la realloc
 					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
 					//Ora devo inserire in testa la nuova copia
@@ -378,15 +382,19 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 					p=p->prox;
 					}
 					//Inserisco i valori
-					scannerTM->currentState = p->nextState;
-					scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
-					//Qui è da inserire il check per la realloc
-					scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
-					//Ora devo inserire in testa la nuova copia
-					p=NULL;
+				scannerTM->currentState = p->nextState;
+				printf("Cambiato stato: %d\n", scannerTM->currentState);
+				scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
+				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
+				//Qui è da inserire il check per la realloc
+				scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
+				printf("Posizione testina dopo modifica: %d\n",scannerTM->tapePosition);
+				//Ora devo inserire in testa la nuova copia
+				p=NULL;
 
 
 			}else {
+				printf("Sono nel caso di transizioni finite\n");
 				//QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
 				//POI E' DA GESTIRE LA FREE E RICONCATENAMENTO
 
