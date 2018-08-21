@@ -171,7 +171,7 @@ int main() {
     	//INIZIALIZZAZIONE
     	headTM = initializeSimulation(inputTape);
     	printf("Stato iniziale: %d\n",headTM->currentState);
-    	printf("Printo contenuto del tape copiato:%s\n",headTM->tape);
+    	printf("Printo contenuto del tape copiato inizialmente:%s\n",headTM->tape);
     	printf("Dimensioni del mio array: %d\n", headTM->tapesize);
 		free(inputTape);
 
@@ -368,6 +368,9 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 					//Inserisco i valori
 					newTM->currentState = p->nextState;
 					//QUI COPIO LA STRINGA
+					newTM->tapesize = scannerTM->tapesize;
+					newTM->tapePosition=scannerTM->tapePosition;
+					// PROBABILMENE MANCA INIZIALIZZAZIONE DI TAPE POSITION. CONTROLLA CHE NELLA COPIA ASSEGNO TUTTE LEVARIABILI!!!!!!
 					newTM->tape=malloc(sizeof(char)*scannerTM->tapesize);
 					memcpy(newTM->tape,scannerTM->tape,scannerTM->tapesize);
 					newTM->tape[newTM->tapePosition] = p->writeOutput;

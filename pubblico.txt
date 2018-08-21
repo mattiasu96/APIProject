@@ -1,6 +1,8 @@
 tr
 0 a b R 1
 1 a b R 2
+0 a c R 3
+3 a K R 4
 acc
 2
 max
