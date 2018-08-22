@@ -342,10 +342,17 @@ TM *initializeSimulation(char *tape){
 	p=malloc(sizeof(TM));
 	p->currentState=0;
 	p->tapePosition=0;
-	p->tapesize=strlen(tape)+1;
-	p->tape=malloc(sizeof(char)*(p->tapesize));
+	p->tapesize=strlen(tape);
+	p->tape=malloc(sizeof(char)*((p->tapesize)+1));
+	printf("Dimensione inizializzato: %d\n",p->tapesize);
 	//Inserire memcpy
 	strcpy(p->tape,tape);
+	printf("Strlen inizializzato: %d\n",p->tapesize);
+	printf("Posizione testina inizializzato: %d\n",p->tapePosition);
+	printf("Contenuto tape inizializzato: %s\n",p->tape);
+
+
+
 	p->prox=NULL;
 	p->prec=NULL;
 	return p;
@@ -353,6 +360,8 @@ TM *initializeSimulation(char *tape){
 
 
 TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
+	char blank[]="_____________________________________________";
+	int blankLenght = strlen(blank);
 	TM *scannerTM = NULL;
 	TM *newTM = NULL;
 	scannerTM =headTM;
@@ -371,11 +380,21 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 					newTM->tapesize = scannerTM->tapesize;
 					newTM->tapePosition=scannerTM->tapePosition;
 					// PROBABILMENE MANCA INIZIALIZZAZIONE DI TAPE POSITION. CONTROLLA CHE NELLA COPIA ASSEGNO TUTTE LEVARIABILI!!!!!!
-					newTM->tape=malloc(sizeof(char)*scannerTM->tapesize);
-					memcpy(newTM->tape,scannerTM->tape,scannerTM->tapesize);
+					newTM->tape=malloc(sizeof(char)*((scannerTM->tapesize)+1));
+					memcpy(newTM->tape,scannerTM->tape,((scannerTM->tapesize)+1));
 					newTM->tape[newTM->tapePosition] = p->writeOutput;
 
 					//Qui è da inserire il check per la realloc
+					//CHECK DESTRO
+					if((newTM->tapePosition)+(p->shiftTape)==newTM->tapesize){
+						newTM->tape=realloc(newTM->tape,blankLenght+1+newTM->tapesize);
+						memcpy(&newTM->tape[newTM->tapesize],blank,blankLenght+1);
+						newTM->tapesize=newTM->tapesize+blankLenght;
+						printf("Sforo gli indici\n");
+
+
+					}
+
 					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
 					//Ora devo inserire in testa la nuova copia
 					newTM->prox = headTM;
@@ -390,9 +409,25 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 				scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
 				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
 				//Qui è da inserire il check per la realloc
+				if(scannerTM->tapePosition+p->shiftTape==scannerTM->tapesize){
+						scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
+						memcpy(&scannerTM->tape[scannerTM->tapesize],blank,blankLenght+1);
+
+						scannerTM->tapesize=scannerTM->tapesize+blankLenght;
+						printf("Sforo gli indici\n");
+						int i=0;
+						for(i=0;i<scannerTM->tapesize;i++){
+							printf("Printo carattere: %c\n", scannerTM->tape[i]);
+						}
+
+
+					}
 				scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
+				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
+
 				printf("Posizione testina dopo modifica: %d\n",scannerTM->tapePosition);
-				//Ora devo inserire in testa la nuova copia
+				printf("strlen del nastro: %d\n",scannerTM->tapesize);
+
 				p=NULL;
 
 
