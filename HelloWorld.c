@@ -360,7 +360,7 @@ TM *initializeSimulation(char *tape){
 
 
 TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
-	char blank[]="_____________________________________________";
+	char blank[]="___";
 	int blankLenght = strlen(blank);
 	TM *scannerTM = NULL;
 	TM *newTM = NULL;
@@ -394,6 +394,15 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 
 
 					}
+					if(newTM->tapePosition+p->shiftTape==-1){
+						newTM->tape=realloc(newTM->tape,newTM->tapesize+blankLenght+1);
+						memmove(&newTM->tape[blankLenght],newTM->tape,newTM->tapesize+1);
+						memcpy(newTM->tape,blank,blankLenght);
+						newTM->tapesize=newTM->tapesize+blankLenght;
+						newTM->tapePosition=newTM->tapePosition+blankLenght;
+
+
+				}
 
 					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
 					//Ora devo inserire in testa la nuova copia
@@ -408,7 +417,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 				printf("Cambiato stato: %d\n", scannerTM->currentState);
 				scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
 				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
-				//Qui è da inserire il check per la realloc
+				//ESTENSIONE A DESTRA
 				if(scannerTM->tapePosition+p->shiftTape==scannerTM->tapesize){
 						scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
 						memcpy(&scannerTM->tape[scannerTM->tapesize],blank,blankLenght+1);
@@ -422,6 +431,22 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 
 
 					}
+					//ESTENSIONE A SINISTRA
+				if(scannerTM->tapePosition+p->shiftTape==-1){
+						scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
+						printf("Contenuto nastro dopo realloc: %s\n",scannerTM->tape);
+
+						memmove(&scannerTM->tape[blankLenght],scannerTM->tape,scannerTM->tapesize+1);
+						printf("Contenuto nastro dopo memmove: %s\n",scannerTM->tape);
+
+						memcpy(scannerTM->tape,blank,blankLenght);
+						scannerTM->tapesize=scannerTM->tapesize+blankLenght;
+						scannerTM->tapePosition=scannerTM->tapePosition+blankLenght;
+
+
+				}
+
+
 				scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
 				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
 
