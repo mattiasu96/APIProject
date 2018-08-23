@@ -5,6 +5,8 @@
 
 #define MAX 10
 #define ASCII 128
+
+int accettazione = 0;
 typedef struct T{
     int startState;
     char readInput;
@@ -33,8 +35,7 @@ void inserisciCoda(Transition *element,Transition *position);
 int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape);
-TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState);
-
+TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState,int *listaAccettazione, int dimensoniLista);
 
 
 
@@ -169,6 +170,7 @@ int main() {
     	printf("Tape originale: %s\n",inputTape);
     	printf("%ld\n", strlen(inputTape));
     	//INIZIALIZZAZIONE
+    	accettazione=0;
     	headTM = initializeSimulation(inputTape);
     	printf("Stato iniziale: %d\n",headTM->currentState);
     	printf("Printo contenuto del tape copiato inizialmente:%s\n",headTM->tape);
@@ -178,11 +180,14 @@ int main() {
 		//SIMULAZIONE
 		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
 		while(counterPassi<numpassi){
-		headTM = iterateListTM(headTM,inputStatesArray,maxInputState);
+		headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
 		
 		//INSERIRE INCREMENTO CONTATORE 
 		counterPassi++;
 	}
+	//INSERIRE LAST CHECK QUI
+
+	//PULIRE TUTTO QUI
 
 
 
@@ -359,13 +364,14 @@ TM *initializeSimulation(char *tape){
 }
 
 
-TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
+TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc){
 	char blank[]="___";
 	int blankLenght = strlen(blank);
 	TM *scannerTM = NULL;
 	TM *newTM = NULL;
 	scannerTM =headTM;
 	Transition *p=NULL;
+	int i=0;
 	while(scannerTM!=NULL){
 			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
@@ -379,7 +385,6 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 					//QUI COPIO LA STRINGA
 					newTM->tapesize = scannerTM->tapesize;
 					newTM->tapePosition=scannerTM->tapePosition;
-					// PROBABILMENE MANCA INIZIALIZZAZIONE DI TAPE POSITION. CONTROLLA CHE NELLA COPIA ASSEGNO TUTTE LEVARIABILI!!!!!!
 					newTM->tape=malloc(sizeof(char)*((scannerTM->tapesize)+1));
 					memcpy(newTM->tape,scannerTM->tape,((scannerTM->tapesize)+1));
 					newTM->tape[newTM->tapePosition] = p->writeOutput;
@@ -424,10 +429,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 
 						scannerTM->tapesize=scannerTM->tapesize+blankLenght;
 						printf("Sforo gli indici\n");
-						int i=0;
-						for(i=0;i<scannerTM->tapesize;i++){
-							printf("Printo carattere: %c\n", scannerTM->tape[i]);
-						}
+						
 
 
 					}
@@ -459,7 +461,21 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState){
 			}else {
 				printf("Sono nel caso di transizioni finite\n");
 				//QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
-				//POI E' DA GESTIRE LA FREE E RICONCATENAMENTO
+				for(i=0;i<dimensoniListaAcc;i++){
+					//RICERCA ACCETTAZIONE
+					if(scannerTM->currentState==listaAccettazione[i]){
+						accettazione=1;
+						break;
+					}
+
+				}
+				if(accettazione==0){
+					//RIMUOVI DALLA CODA
+
+				}
+
+
+
 
 			}
 			scannerTM=scannerTM->prox;

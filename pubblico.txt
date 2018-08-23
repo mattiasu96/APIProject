@@ -6,6 +6,9 @@ tr
 4 _ J L 5
 acc
 5
+10
+4
+7
 max
 5
 run
