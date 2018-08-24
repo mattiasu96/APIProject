@@ -36,8 +36,7 @@ int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape);
 TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState,int *listaAccettazione, int dimensoniLista);
-TM *lastCheck(TM *headTM);
-
+void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc);
 
 
 int main() {
@@ -196,9 +195,14 @@ int main() {
 	else
 		if(accettazione=='N'){
 			//DICHIARARE IL FUNZIONAMENTO DI lastCheck
-			headTM=lastCheck(headTM);
+			lastCheck(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
 		}
-
+	if(accettazione=='N'){
+		accettazione='0';
+		printf("Rifiuto");
+	}
+	else
+		printf("Macchina termina con: %c", accettazione);
 	//PULIRE TUTTO QUI
 
 
@@ -539,10 +543,12 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 	return headTM;
 }
 
-TM *lastCheck(TM *headTM){
+void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc){
 	TM *scannerTM=NULL;
 	scannerTM=headTM;
-	while(scannerTM!=NULL){
+	int i=0;
+	while(scannerTM!=NULL && accettazione!='1'){
+			printf("Sono entrato nella funzione di lastCheck\n");
 			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
 			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
@@ -559,6 +565,8 @@ TM *lastCheck(TM *headTM){
 					}
 
 				}
+			scannerTM=scannerTM->prox;
+
 
 		}
 

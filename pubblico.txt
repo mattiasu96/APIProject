@@ -1,16 +1,14 @@
 tr
-0 a b L 1
-1 _ b L 2
-2 _ c L 3
-3 _ K L 4
-4 _ J L 5
+0 a b R 1
+1 a b R 2
+0 a K R 3
+3 a J R 4
+2 _ J R 5
+4 _ F R 6
 acc
-5
-10
-4
 7
 max
-5
+3
 run
 aa
 
