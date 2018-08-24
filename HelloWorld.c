@@ -36,6 +36,7 @@ int checkMaxStates(Transition *element, int currentMax);
 int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape);
 TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState,int *listaAccettazione, int dimensoniLista);
+TM *lastCheck(TM *headTM);
 
 
 
@@ -180,7 +181,7 @@ int main() {
 
 		//SIMULAZIONE
 		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
-		while(counterPassi<numpassi && accettazione='N'){
+		while(counterPassi<numpassi && accettazione== 'N'){
 		headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
 		
 		//INSERIRE INCREMENTO CONTATORE 
@@ -384,7 +385,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 	Transition *p=NULL;
 	int i=0;
 	int rimossoInTesta=0;
-	while(scannerTM!=NULL && accettazione='N'){
+	while(scannerTM!=NULL && accettazione=='N'){
 			rimossoInTesta=0;
 			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
@@ -537,3 +538,32 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 
 	return headTM;
 }
+
+TM *lastCheck(TM *headTM){
+	TM *scannerTM=NULL;
+	scannerTM=headTM;
+	while(scannerTM!=NULL){
+			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
+			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
+			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
+				accettazione='U';
+
+
+			}
+			else
+				for(i=0;i<dimensoniListaAcc;i++){
+					//RICERCA ACCETTAZIONE
+					if(scannerTM->currentState==listaAccettazione[i]){
+						accettazione='1';
+						break;
+					}
+
+				}
+
+		}
+
+
+
+
+}
+
