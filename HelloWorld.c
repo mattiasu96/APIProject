@@ -6,7 +6,7 @@
 #define MAX 10
 #define ASCII 128
 
-int accettazione = 0;
+char accettazione = 'N';
 typedef struct T{
     int startState;
     char readInput;
@@ -170,7 +170,7 @@ int main() {
     	printf("Tape originale: %s\n",inputTape);
     	printf("%ld\n", strlen(inputTape));
     	//INIZIALIZZAZIONE
-    	accettazione=0;
+    	accettazione='N';
     	headTM = initializeSimulation(inputTape);
     	printf("Stato iniziale: %d\n",headTM->currentState);
     	printf("Printo contenuto del tape copiato inizialmente:%s\n",headTM->tape);
@@ -464,15 +464,46 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 				for(i=0;i<dimensoniListaAcc;i++){
 					//RICERCA ACCETTAZIONE
 					if(scannerTM->currentState==listaAccettazione[i]){
-						accettazione=1;
+						accettazione='1';
 						break;
 					}
 
 				}
-				if(accettazione==0){
-					//RIMUOVI DALLA CODA
+				if(accettazione=='N'){
+					//Eliminazione in testa
+					if(scannerTM->prec==NULL){
+						printf("Libero nodo terminato in testa\n");
+
+						headTM=scannerTM->prox;
+						headTM->prec=NULL;
+						free(scannerTM->tape);
+						free(scannerTM);
+						scannerTM=headTM;
+
+					}
+					else
+						if(scannerTM->prox==NULL){
+							printf("Libero nodo terminato in coda\n");
+
+							scannerTM=scannerTM->prec;
+							free(scannerTM->prox->tape);
+							free(scannerTM->prox);
+							scannerTM->prox=NULL;
+
+
+						}
+						else{
+							printf("Libero nodo terminato in mezzo\n");
+
+
+
+
+					
+
+
 
 				}
+						}
 
 
 
