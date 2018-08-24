@@ -171,6 +171,7 @@ int main() {
     	printf("%ld\n", strlen(inputTape));
     	//INIZIALIZZAZIONE
     	accettazione='N';
+    	counterPassi=0;
     	headTM = initializeSimulation(inputTape);
     	printf("Stato iniziale: %d\n",headTM->currentState);
     	printf("Printo contenuto del tape copiato inizialmente:%s\n",headTM->tape);
@@ -179,13 +180,23 @@ int main() {
 
 		//SIMULAZIONE
 		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
-		while(counterPassi<numpassi){
+		while(counterPassi<numpassi && accettazione='N'){
 		headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
 		
 		//INSERIRE INCREMENTO CONTATORE 
 		counterPassi++;
 	}
 	//INSERIRE LAST CHECK QUI
+
+	if(headTM==NULL && accettazione=='N'){
+		printf("IL RISULTATO E' 0\n");
+		accettazione='0';
+	}
+	else
+		if(accettazione=='N'){
+			//DICHIARARE IL FUNZIONAMENTO DI lastCheck
+			headTM=lastCheck(headTM);
+		}
 
 	//PULIRE TUTTO QUI
 
@@ -372,7 +383,9 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 	scannerTM =headTM;
 	Transition *p=NULL;
 	int i=0;
-	while(scannerTM!=NULL){
+	int rimossoInTesta=0;
+	while(scannerTM!=NULL && accettazione='N'){
+			rimossoInTesta=0;
 			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
 			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
@@ -479,6 +492,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 						free(scannerTM->tape);
 						free(scannerTM);
 						scannerTM=headTM;
+						rimossoInTesta=1;
 
 					}
 					else
@@ -494,8 +508,12 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 						}
 						else{
 							printf("Libero nodo terminato in mezzo\n");
-
-
+							scannerTM=scannerTM->prec;
+							scannerTM->prox=scannerTM->prox->prox;
+							//FREE DEL NODO
+							free(scannerTM->prox->prec->tape);
+							free(scannerTM->prox->prec);
+							scannerTM->prox->prec=scannerTM;
 
 
 					
@@ -509,7 +527,9 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 
 
 			}
+			if(rimossoInTesta!=1){
 			scannerTM=scannerTM->prox;
+		}
 
 		}
 
