@@ -180,7 +180,7 @@ int main() {
 
 		//SIMULAZIONE
 		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
-		while(counterPassi<numpassi && accettazione== 'N'){
+		while(counterPassi<numpassi && accettazione== 'N' && headTM!=NULL){
 		headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
 		
 		//INSERIRE INCREMENTO CONTATORE 
@@ -493,7 +493,11 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 						printf("Libero nodo terminato in testa\n");
 
 						headTM=scannerTM->prox;
-						headTM->prec=NULL;
+						//BUG QUI, NEL CASO MI RIMANE UN SOLO ELEMENTO,HEADTM VA A PUNTARE A NULL!
+						if(headTM!=NULL){
+							headTM->prec=NULL;
+
+						}
 						free(scannerTM->tape);
 						free(scannerTM);
 						scannerTM=headTM;
@@ -519,13 +523,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 							free(scannerTM->prox->prec->tape);
 							free(scannerTM->prox->prec);
 							scannerTM->prox->prec=scannerTM;
-
-
-					
-
-
-
-				}
+							}
 						}
 
 
@@ -534,7 +532,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 			}
 			if(rimossoInTesta!=1){
 			scannerTM=scannerTM->prox;
-		}
+			}	
 
 		}
 
