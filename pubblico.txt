@@ -1,14 +1,17 @@
 tr
-0 a b R 1
+0 0 b R 1
+0 0 J L 2
+0 0 K R 4
+0 0 J R 5
 1 a b R 2
-0 a K R 3
-3 a J R 4
-2 _ J R 5
-4 _ F R 6
+5 a b R 4
+6 a b R 9
+7 a b R 9
+11 z z L 10
+11 z U R 9 
+11 z J R 7
 acc
-7
+3
 max
-4
+3
 run
-aa
-

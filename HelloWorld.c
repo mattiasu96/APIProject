@@ -4,7 +4,7 @@
 
 
 #define MAX 10
-#define ASCII 128
+#define ASCII 75
 
 char accettazione = 'N';
 typedef struct T{
@@ -37,6 +37,7 @@ int *acquireAcceptStates(int *NacceptState);
 TM *initializeSimulation(char *tape);
 TM *iterateListTM(TM *headTM,Transition ***transizioni, int maxInputState,int *listaAccettazione, int dimensoniLista);
 void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc);
+TM *cleanAll(TM *headTM);
 
 
 int main() {
@@ -84,7 +85,7 @@ int main() {
             printf("Printo dimensiona massima di stati di ingresso di stati max: %d\n", maxInputSize);
 
             //Fast check of conversion from ASCII to number, in order to insert in the right index
-            tempchar = (int) temporaryTransition->readInput;
+            tempchar = (int) (temporaryTransition->readInput)-48;
             // FORSE QUA DEVO CAMBIARE GLI ORDINI, POTREBBE ESSER QUI IL PROBLEMA
             tempstate = temporaryTransition ->startState;
             printf("%d\n",tempstate);
@@ -189,7 +190,6 @@ int main() {
 	//INSERIRE LAST CHECK QUI
 
 	if(headTM==NULL && accettazione=='N'){
-		printf("IL RISULTATO E' 0\n");
 		accettazione='0';
 	}
 	else
@@ -199,19 +199,16 @@ int main() {
 		}
 	if(accettazione=='N'){
 		accettazione='0';
-		printf("Rifiuto");
+		printf("Macchina termina con: %c\n", accettazione);
 	}
 	else
-		printf("Macchina termina con: %c", accettazione);
+		printf("Macchina termina con: %c\n", accettazione);
 	//PULIRE TUTTO QUI
+	}
 
-
-
-    }
-
-
-
-
+	if(headTM!=NULL){
+		headTM= cleanAll(headTM);
+	}
 
     return 0;
 }
@@ -391,7 +388,7 @@ TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *li
 	int rimossoInTesta=0;
 	while(scannerTM!=NULL && accettazione=='N'){
 			rimossoInTesta=0;
-			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
+			int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
 			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
 				p=transizioni[scannerTM->currentState][tempchar];
@@ -547,7 +544,7 @@ void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *lista
 	int i=0;
 	while(scannerTM!=NULL && accettazione!='1'){
 			printf("Sono entrato nella funzione di lastCheck\n");
-			int tempchar =(int) scannerTM->tape[scannerTM->tapePosition];
+			int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
 			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
 			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
 				accettazione='U';
@@ -572,4 +569,17 @@ void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *lista
 
 
 }
+
+TM *cleanAll(TM *headTM){
+	TM *scannerTM = headTM;
+	printf("Sto ripulendo\n");
+	while(headTM!=NULL){
+		headTM=scannerTM->prox;
+		free(scannerTM->tape);
+		free(scannerTM);
+		scannerTM=headTM;
+	}
+	return headTM;
+}
+
 
