@@ -21,12 +21,12 @@ typedef struct T{
 
 // Controlla Strlen come funzione, potrebbe essere utile
 typedef struct turing{
-	int currentState;
-	int tapesize;
-	int tapePosition;
-	char *tape;
-	struct turing *prox;
-	struct turing *prec;
+    int currentState;
+    int tapesize;
+    int tapePosition;
+    char *tape;
+    struct turing *prox;
+    struct turing *prec;
 } TM;
 
 Transition *acquireTransition();
@@ -41,20 +41,19 @@ TM *cleanAll(TM *headTM);
 
 
 int main() {
-	char *inputTape;
-	TM *headTM=NULL;
-	Transition *temporaryTransition=NULL;
+    char *inputTape;
+    TM *headTM=NULL;
+    Transition *temporaryTransition=NULL;
     Transition ***inputStatesArray = {NULL};
     Transition ***check = {NULL};
     int maxInputSize;
     int tempchar;
     int tempstate;
-    Transition *p=NULL;
     int *acceptStates=NULL;
     int maxInputState=0;
     int numberofAcceptStates=0;
     int currentIndex=MAX;
-	int i=0;
+    int i=0;
     unsigned int numpassi=0;
     unsigned int counterPassi=0;
 
@@ -65,150 +64,106 @@ int main() {
     inputStatesArray = malloc(sizeof(Transition**)*MAX);
     for (int i = 0; i < currentIndex; ++i)
     {
-  		inputStatesArray[i]=NULL;
-  		printf("%p",inputStatesArray[i] );
+        inputStatesArray[i]=NULL;
     }
             
     do{
         //Ricevo puntatore alla transition creata
         temporaryTransition = acquireTransition();
         if(temporaryTransition->startState!= -1){
-            printf("%d", temporaryTransition->startState);
-            printf("%c", temporaryTransition->readInput);
-            printf("%c", temporaryTransition->writeOutput);
-            printf("%d", temporaryTransition->shiftTape);
-            printf("%d\n", temporaryTransition->nextState);
+    
 
             maxInputState = checkMaxStates(temporaryTransition, maxInputState);
             maxInputSize= maxInputState+1;
-            printf("Printo numero di stati max: %d\n", maxInputState);
-            printf("Printo dimensiona massima di stati di ingresso di stati max: %d\n", maxInputSize);
-
+           
             //Fast check of conversion from ASCII to number, in order to insert in the right index
             tempchar = (int) (temporaryTransition->readInput)-48;
             // FORSE QUA DEVO CAMBIARE GLI ORDINI, POTREBBE ESSER QUI IL PROBLEMA
             tempstate = temporaryTransition ->startState;
-            printf("%d\n",tempstate);
-            printf("%d\n", tempchar);
+         
             //ERRORE QUI
             if(maxInputSize>currentIndex){
-            	printf("Sto reallocando\n");
-            	check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputSize));
-            	//FIN QUI HA SENSO
-            	if(check!=NULL)
-            		inputStatesArray=check;
-            	printf("Prima ciclo if\n");
-            	//FORSE ALTRO BUG QUI, NON INIZIALIZZO L'ULTIMO!!
-            	for(i=currentIndex;i<maxInputSize;i++){
-            		printf("Metto a null\n");
-					inputStatesArray[i]=NULL;
-            	}
-            	currentIndex=maxInputSize;
-            	printf("Dopo ciclo if\n");
+                check = realloc(inputStatesArray, sizeof(Transition**)*(maxInputSize));
+                //FIN QUI HA SENSO
+                if(check!=NULL)
+                    inputStatesArray=check;
+                //FORSE ALTRO BUG QUI, NON INIZIALIZZO L'ULTIMO!!
+                for(i=currentIndex;i<maxInputSize;i++){
+                    inputStatesArray[i]=NULL;
+                }
+                currentIndex=maxInputSize;
 
 
             }
-            for (int i = 0; i < currentIndex; ++i)
-    		{
-  				printf("%p ",inputStatesArray[i] );
-    		}
-            printf("Prima dell'errore Puntaotre a: %p\n",inputStatesArray[tempstate] );
+            
 
             if(inputStatesArray[tempstate]==NULL){
-            	printf("Dentro if calloc\n");
-
-            	inputStatesArray[tempstate] = calloc(ASCII,sizeof(Transition*));
+                inputStatesArray[tempstate] = calloc(ASCII,sizeof(Transition*));
 
             }
-            printf("Dopo Check if\n");
-            printf("Puntaotre a: %p\n",inputStatesArray[tempstate] );
-
+           
 
             
-            printf("Printo valore del puntatore: %p\n", inputStatesArray[tempstate][tempchar]);
             if(inputStatesArray[tempstate][tempchar]==0){
 
                 inputStatesArray[tempstate][tempchar]=temporaryTransition;
             }
             else{
- 				 // BUG QUI
-                 printf("Possibile bug nell'accodamento?\n");
-
                 inserisciCoda(temporaryTransition,inputStatesArray[tempstate][tempchar]);
-                printf("Elemento già inserito in questa posizione: sto accodando\n");
             }
-            
-            printf("Prima del test\n");
-            p=inputStatesArray[tempstate][tempchar];
-            while (p->prox!=NULL){
-                
-                printf("Printo valore in inputStatesArray: %d\n",p->startState); 
-                printf("Printo valore in inputStatesArray: %c\n",p->writeOutput);    
-                p = p-> prox;   
-            } 
-            
-
-        
-
-        }
+                        
+            }
 
     }while(temporaryTransition->startState!= -1);
     free(temporaryTransition);
 
 
     acceptStates = acquireAcceptStates(&numberofAcceptStates);
-    printf("Numero di stati di accettazione: %d\n", numberofAcceptStates);
-    for(i=0;i<numberofAcceptStates;i++)
-        printf("Valore stato di accettazione i-esimo: %d\n", acceptStates[i]);
+
     
     scanf("%u", &numpassi);
-    printf("%u", numpassi);
     phantomScan();
 
     
     //INIZIO PARTE DI SIMULAZIONE 
     while(scanf("%ms",&inputTape)!=EOF){
-    	printf("Tape originale: %s\n",inputTape);
-    	printf("%ld\n", strlen(inputTape));
-    	//INIZIALIZZAZIONE
-    	accettazione='N';
-    	counterPassi=0;
-    	headTM = initializeSimulation(inputTape);
-    	printf("Stato iniziale: %d\n",headTM->currentState);
-    	printf("Printo contenuto del tape copiato inizialmente:%s\n",headTM->tape);
-    	printf("Dimensioni del mio array: %d\n", headTM->tapesize);
-		free(inputTape);
+        //INIZIALIZZAZIONE
+        accettazione='N';
+        counterPassi=0;
+        headTM = initializeSimulation(inputTape);
+        free(inputTape);
 
-		//SIMULAZIONE
-		//QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
-		while(counterPassi<numpassi && accettazione== 'N' && headTM!=NULL){
-		headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
-		
-		//INSERIRE INCREMENTO CONTATORE 
-		counterPassi++;
-	}
-	//INSERIRE LAST CHECK QUI
+        //SIMULAZIONE
+        //QUI DEVO METTERE UN WHILE AMPIO SU FINE COMPUTAZIONI O LISTA VUOTA O ACCETTAZIONE TROVATA.
+        while(counterPassi<numpassi && accettazione== 'N' && headTM!=NULL){
+        headTM = iterateListTM(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
+        
+        //INSERIRE INCREMENTO CONTATORE 
+        counterPassi++;
+    }
+    //INSERIRE LAST CHECK QUI
 
-	if(headTM==NULL && accettazione=='N'){
-		accettazione='0';
-	}
-	else
-		if(accettazione=='N'){
-			//DICHIARARE IL FUNZIONAMENTO DI lastCheck
-			lastCheck(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
-		}
-	if(accettazione=='N'){
-		accettazione='0';
-		printf("Macchina termina con: %c\n", accettazione);
-	}
-	else
-		printf("Macchina termina con: %c\n", accettazione);
-	//PULIRE TUTTO QUI
-	}
+    if(headTM==NULL && accettazione=='N'){
+        accettazione='0';
+    }
+    else
+        if(accettazione=='N'){
+            //DICHIARARE IL FUNZIONAMENTO DI lastCheck
+            lastCheck(headTM,inputStatesArray,maxInputState,acceptStates,numberofAcceptStates);
+        }
+    if(accettazione=='N'){
+        accettazione='0';
+        printf("%c\n", accettazione);
+    }
+    else
+        printf("%c\n", accettazione);
+    //PULIRE TUTTO QUI
+    if(headTM!=NULL){
+        headTM= cleanAll(headTM);
+    }
+    }
 
-	if(headTM!=NULL){
-		headTM= cleanAll(headTM);
-	}
+    
 
     return 0;
 }
@@ -227,7 +182,6 @@ Transition *acquireTransition(){
             free ( start);
             start = NULL;
         }
-        printf("before start: ");
         fflush ( stdout);
         scanf("%ms", &start);
         
@@ -237,16 +191,8 @@ Transition *acquireTransition(){
                 free ( end);
                 end = NULL;
             }
-            printf("in if: ");
             fflush ( stdout);
             scanf(" %c %c %c %ms", &in, &out, &shift, &end);
-            printf("%s", start);
-            printf("%c", in);
-            printf("%c", out);
-            printf("%c", shift);
-            printf("%s\n", end);
-            //Now i insert the read data into a Transition Node
-
             firstState = atoi(start);
             secondState = atoi(end);
 
@@ -264,7 +210,6 @@ Transition *acquireTransition(){
                     shiftInt = 1;
                     break;
             }
-            printf("Valore di shift int: %d\n", shiftInt);
             transition->shiftTape = shiftInt;
             transition->nextState = secondState;
             transition->prox = NULL;
@@ -290,7 +235,6 @@ Transition *acquireTransition(){
 void phantomScan(){
     char phantomString[10];
     scanf("%s", phantomString);
-    printf("%s\n", phantomString);
 }
 
 void inserisciCoda(Transition *element,Transition *position){
@@ -309,6 +253,8 @@ int checkMaxStates(Transition *element,int currentMax){
 
     if(max<element->startState)
         max = element->startState;
+    if(max<element->nextState)
+        max=element->nextState;
     
 
     return max;
@@ -356,214 +302,193 @@ int *acquireAcceptStates(int *NacceptState){
 }
 
 TM *initializeSimulation(char *tape){
-	TM *p=NULL;
-	p=malloc(sizeof(TM));
-	p->currentState=0;
-	p->tapePosition=0;
-	p->tapesize=strlen(tape);
-	p->tape=malloc(sizeof(char)*((p->tapesize)+1));
-	printf("Dimensione inizializzato: %d\n",p->tapesize);
-	//Inserire memcpy
-	strcpy(p->tape,tape);
-	printf("Strlen inizializzato: %d\n",p->tapesize);
-	printf("Posizione testina inizializzato: %d\n",p->tapePosition);
-	printf("Contenuto tape inizializzato: %s\n",p->tape);
-
-
-
-	p->prox=NULL;
-	p->prec=NULL;
-	return p;
+    TM *p=NULL;
+    p=malloc(sizeof(TM));
+    p->currentState=0;
+    p->tapePosition=0;
+    p->tapesize=strlen(tape);
+    p->tape=malloc(sizeof(char)*((p->tapesize)+1));
+    //Inserire memcpy
+    strcpy(p->tape,tape);
+    p->prox=NULL;
+    p->prec=NULL;
+    return p;
 }
 
 
 TM *iterateListTM(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc){
-	char blank[]="___";
-	int blankLenght = strlen(blank);
-	TM *scannerTM = NULL;
-	TM *newTM = NULL;
-	scannerTM =headTM;
-	Transition *p=NULL;
-	int i=0;
-	int rimossoInTesta=0;
-	while(scannerTM!=NULL && accettazione=='N'){
-			rimossoInTesta=0;
-			int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
-			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
-			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
-				p=transizioni[scannerTM->currentState][tempchar];
-				printf("Stato prossimo della prima transizione letta %d\n", p->nextState);
-				while(p->prox!=NULL){
-					newTM = malloc(sizeof(TM));
-					//Inserisco i valori
-					newTM->currentState = p->nextState;
-					//QUI COPIO LA STRINGA
-					newTM->tapesize = scannerTM->tapesize;
-					newTM->tapePosition=scannerTM->tapePosition;
-					newTM->tape=malloc(sizeof(char)*((scannerTM->tapesize)+1));
-					memcpy(newTM->tape,scannerTM->tape,((scannerTM->tapesize)+1));
-					newTM->tape[newTM->tapePosition] = p->writeOutput;
+    int blankLenght = 6000;
+    TM *scannerTM = NULL;
+    TM *newTM = NULL;
+    scannerTM =headTM;
+    Transition *p=NULL;
+    int i=0;
+    int rimossoInTesta=0;
+    while(scannerTM!=NULL && accettazione=='N'){
+            rimossoInTesta=0;
+            int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
+            //Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
+            if(transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
+                p=transizioni[scannerTM->currentState][tempchar];
+                while(p->prox!=NULL){
+                    newTM = malloc(sizeof(TM));
+                    //Inserisco i valori
+                    newTM->currentState = p->nextState;
+                    //QUI COPIO LA STRINGA
+                    newTM->tapesize = scannerTM->tapesize;
+                    newTM->tapePosition=scannerTM->tapePosition;
+                    newTM->tape=malloc(sizeof(char)*((scannerTM->tapesize)+1));
+                    memcpy(newTM->tape,scannerTM->tape,((scannerTM->tapesize)+1));
+                    newTM->tape[newTM->tapePosition] = p->writeOutput;
 
-					//Qui è da inserire il check per la realloc
-					//CHECK DESTRO
-					if((newTM->tapePosition)+(p->shiftTape)==newTM->tapesize){
-						newTM->tape=realloc(newTM->tape,blankLenght+1+newTM->tapesize);
-						memcpy(&newTM->tape[newTM->tapesize],blank,blankLenght+1);
-						newTM->tapesize=newTM->tapesize+blankLenght;
-						printf("Sforo gli indici\n");
-
-
-					}
-					if(newTM->tapePosition+p->shiftTape==-1){
-						newTM->tape=realloc(newTM->tape,newTM->tapesize+blankLenght+1);
-						memmove(&newTM->tape[blankLenght],newTM->tape,newTM->tapesize+1);
-						memcpy(newTM->tape,blank,blankLenght);
-						newTM->tapesize=newTM->tapesize+blankLenght;
-						newTM->tapePosition=newTM->tapePosition+blankLenght;
+                    //Qui è da inserire il check per la realloc
+                    //CHECK DESTRO
+                    if((newTM->tapePosition)+(p->shiftTape)==newTM->tapesize){
+                        newTM->tape=realloc(newTM->tape,blankLenght+1+newTM->tapesize);
+                        //memcpy(&newTM->tape[newTM->tapesize],blank,blankLenght+1);
+                        memset(&newTM->tape[newTM->tapesize],'_',blankLenght);
+                        newTM->tapesize=newTM->tapesize+blankLenght;
+                        newTM->tape[newTM->tapesize]='\0';
 
 
-				}
-
-					newTM->tapePosition = newTM->tapePosition+p->shiftTape;
-					//Ora devo inserire in testa la nuova copia
-					newTM->prox = headTM;
-					newTM->prec =NULL;
-					headTM->prec = newTM;
-					headTM = newTM;
-					p=p->prox;
-					}
-					//Inserisco i valori
-				scannerTM->currentState = p->nextState;
-				printf("Cambiato stato: %d\n", scannerTM->currentState);
-				scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
-				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
-				//ESTENSIONE A DESTRA
-				if(scannerTM->tapePosition+p->shiftTape==scannerTM->tapesize){
-						scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
-						memcpy(&scannerTM->tape[scannerTM->tapesize],blank,blankLenght+1);
-
-						scannerTM->tapesize=scannerTM->tapesize+blankLenght;
-						printf("Sforo gli indici\n");
-						
+                    }
+                    //CHECK A SINISTRA
+                    if(newTM->tapePosition+p->shiftTape==-1){
+                        newTM->tape=realloc(newTM->tape,newTM->tapesize+blankLenght+1);
+                        memmove(&newTM->tape[blankLenght],newTM->tape,newTM->tapesize+1);
+                        //memcpy(newTM->tape,blank,blankLenght);
+                        memset(newTM->tape,'_',blankLenght);
+                        newTM->tapesize=newTM->tapesize+blankLenght;
+                        newTM->tapePosition=newTM->tapePosition+blankLenght;
 
 
-					}
-					//ESTENSIONE A SINISTRA
-				if(scannerTM->tapePosition+p->shiftTape==-1){
-						scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
-						printf("Contenuto nastro dopo realloc: %s\n",scannerTM->tape);
+                }
 
-						memmove(&scannerTM->tape[blankLenght],scannerTM->tape,scannerTM->tapesize+1);
-						printf("Contenuto nastro dopo memmove: %s\n",scannerTM->tape);
-
-						memcpy(scannerTM->tape,blank,blankLenght);
-						scannerTM->tapesize=scannerTM->tapesize+blankLenght;
-						scannerTM->tapePosition=scannerTM->tapePosition+blankLenght;
-
-
-				}
-
-
-				scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
-				printf("Contenuto nastro dopo modifica: %s\n",scannerTM->tape);
-
-				printf("Posizione testina dopo modifica: %d\n",scannerTM->tapePosition);
-				printf("strlen del nastro: %d\n",scannerTM->tapesize);
-
-				p=NULL;
+                    newTM->tapePosition = newTM->tapePosition+p->shiftTape;
+                    //Ora devo inserire in testa la nuova copia
+                    newTM->prox = headTM;
+                    newTM->prec =NULL;
+                    headTM->prec = newTM;
+                    headTM = newTM;
+                    p=p->prox;
+                    }
+                    //Inserisco i valori
+                scannerTM->currentState = p->nextState;
+                scannerTM->tape[scannerTM->tapePosition] = p->writeOutput;
+                //ESTENSIONE A DESTRA
+                if(scannerTM->tapePosition+p->shiftTape==scannerTM->tapesize){
+                        scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
+                        //memcpy(&scannerTM->tape[scannerTM->tapesize],blank,blankLenght+1);
+                        memset(&scannerTM->tape[scannerTM->tapesize],'_',blankLenght);
+                        scannerTM->tapesize=scannerTM->tapesize+blankLenght;
+                        scannerTM->tape[scannerTM->tapesize]='\0';                        
 
 
-			}else {
-				printf("Sono nel caso di transizioni finite\n");
-				//QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
-				for(i=0;i<dimensoniListaAcc;i++){
-					//RICERCA ACCETTAZIONE
-					if(scannerTM->currentState==listaAccettazione[i]){
-						accettazione='1';
-						break;
-					}
+                    }
+                    //ESTENSIONE A SINISTRA
+                if(scannerTM->tapePosition+p->shiftTape==-1){
+                        scannerTM->tape=realloc(scannerTM->tape,scannerTM->tapesize+blankLenght+1);
 
-				}
-				if(accettazione=='N'){
-					//Eliminazione in testa
-					if(scannerTM->prec==NULL){
-						printf("Libero nodo terminato in testa\n");
+                        memmove(&scannerTM->tape[blankLenght],scannerTM->tape,scannerTM->tapesize+1);
 
-						headTM=scannerTM->prox;
-						//BUG QUI, NEL CASO MI RIMANE UN SOLO ELEMENTO,HEADTM VA A PUNTARE A NULL!
-						if(headTM!=NULL){
-							headTM->prec=NULL;
+                        //memcpy(scannerTM->tape,blank,blankLenght);
+                        memset(scannerTM->tape,'_',blankLenght);
 
-						}
-						free(scannerTM->tape);
-						free(scannerTM);
-						scannerTM=headTM;
-						rimossoInTesta=1;
-
-					}
-					else
-						if(scannerTM->prox==NULL){
-							printf("Libero nodo terminato in coda\n");
-
-							scannerTM=scannerTM->prec;
-							free(scannerTM->prox->tape);
-							free(scannerTM->prox);
-							scannerTM->prox=NULL;
+                        scannerTM->tapesize=scannerTM->tapesize+blankLenght;
+                        scannerTM->tapePosition=scannerTM->tapePosition+blankLenght;
 
 
-						}
-						else{
-							printf("Libero nodo terminato in mezzo\n");
-							scannerTM=scannerTM->prec;
-							scannerTM->prox=scannerTM->prox->prox;
-							//FREE DEL NODO
-							free(scannerTM->prox->prec->tape);
-							free(scannerTM->prox->prec);
-							scannerTM->prox->prec=scannerTM;
-							}
-						}
+                }
+
+
+                scannerTM->tapePosition = scannerTM->tapePosition+p->shiftTape;
+                p=NULL;
+
+
+            }else {
+                //QUI E' DA INSERIRE L'EVENTUALE CHECK PER ACCETTAZIONE O STATO POZZO (NON HO PIU' TRANSIZIONI)
+                for(i=0;i<dimensoniListaAcc;i++){
+                    //RICERCA ACCETTAZIONE
+                    if(scannerTM->currentState==listaAccettazione[i]){
+                        accettazione='1';
+                        break;
+                    }
+
+                }
+                if(accettazione=='N'){
+                    //Eliminazione in testa
+                    if(scannerTM->prec==NULL){
+                        headTM=scannerTM->prox;
+                        if(headTM!=NULL){
+                            headTM->prec=NULL;
+
+                        }
+                        free(scannerTM->tape);
+                        free(scannerTM);
+                        scannerTM=headTM;
+                        rimossoInTesta=1;
+
+                    }
+                    else
+                        if(scannerTM->prox==NULL){
+
+                            scannerTM=scannerTM->prec;
+                            free(scannerTM->prox->tape);
+                            free(scannerTM->prox);
+                            scannerTM->prox=NULL;
+
+
+                        }
+                        else{
+                            scannerTM=scannerTM->prec;
+                            scannerTM->prox=scannerTM->prox->prox;
+                            //FREE DEL NODO
+                            free(scannerTM->prox->prec->tape);
+                            free(scannerTM->prox->prec);
+                            scannerTM->prox->prec=scannerTM;
+                            }
+                        }
 
 
 
 
-			}
-			if(rimossoInTesta!=1){
-			scannerTM=scannerTM->prox;
-			}	
+            }
+            if(rimossoInTesta!=1){
+            scannerTM=scannerTM->prox;
+            }   
 
-		}
+        }
 
 
 
-	return headTM;
+    return headTM;
 }
 
 void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *listaAccettazione,int dimensoniListaAcc){
-	TM *scannerTM=NULL;
-	scannerTM=headTM;
-	int i=0;
-	while(scannerTM!=NULL && accettazione!='1'){
-			printf("Sono entrato nella funzione di lastCheck\n");
-			int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
-			//Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
-			if(scannerTM->currentState<=maxInputState && transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
-				accettazione='U';
+    TM *scannerTM=NULL;
+    scannerTM=headTM;
+    int i=0;
+    while(scannerTM!=NULL && accettazione!='1'){
+            int tempchar =(int) (scannerTM->tape[scannerTM->tapePosition])-48;
+            //Checko se sto accedendo a transizioni esistenti, altrimenti verifico se è da terminare
+            if(transizioni[scannerTM->currentState]!=NULL && transizioni[scannerTM->currentState][tempchar]!=NULL){
+                accettazione='U';
 
 
-			}
-			else
-				for(i=0;i<dimensoniListaAcc;i++){
-					//RICERCA ACCETTAZIONE
-					if(scannerTM->currentState==listaAccettazione[i]){
-						accettazione='1';
-						break;
-					}
+            }
+            else
+                for(i=0;i<dimensoniListaAcc;i++){
+                    //RICERCA ACCETTAZIONE
+                    if(scannerTM->currentState==listaAccettazione[i]){
+                        accettazione='1';
+                        break;
+                    }
 
-				}
-			scannerTM=scannerTM->prox;
+                }
+            scannerTM=scannerTM->prox;
 
 
-		}
+        }
 
 
 
@@ -571,15 +496,15 @@ void lastCheck(TM *headTM,Transition ***transizioni,int maxInputState,int *lista
 }
 
 TM *cleanAll(TM *headTM){
-	TM *scannerTM = headTM;
-	printf("Sto ripulendo\n");
-	while(headTM!=NULL){
-		headTM=scannerTM->prox;
-		free(scannerTM->tape);
-		free(scannerTM);
-		scannerTM=headTM;
-	}
-	return headTM;
+    TM *scannerTM = NULL;
+    scannerTM=headTM;
+    while(headTM!=NULL){
+        headTM=scannerTM->prox;
+        free(scannerTM->tape);
+        free(scannerTM);
+        scannerTM=headTM;
+    }
+    return headTM;
 }
 
 
