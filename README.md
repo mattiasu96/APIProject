@@ -60,4 +60,4 @@ Example of output:
 0
 1
 U
-0```
+0 ```
