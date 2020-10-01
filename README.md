@@ -5,9 +5,9 @@ The course covered the fundamentals of algorithms, information theory, data stru
 Full syllabus here: https://www11.ceda.polimi.it/schedaincarico/schedaincarico/controller/scheda_pubblica/SchedaPublic.do?&evn_default=evento&c_classe=667856&polij_device_category=DESKTOP&__pj0=0&__pj1=de552ec089058c1ac72c8ea354915622
 
 ## Project review:
-The project consists in developing a **Non Deterministic Turing Machine** using ANSII-C (no extra libraries allowed besides the standard one), following time and memory constraint imposed by teachers. The implementation meets all the costraint and achieved a grade of **30L/30**.
+The project consists in developing a **Non Deterministic Turing Machine** using ANSII-C (no extra libraries allowed besides the standard one), following time and memory constraint imposed by professors. The implementation meets all the costraint and achieved a grade of **30L/30**.
 
-The code reads an input file with the following structure: 
+The code reads an input file with the following structure: (NB: this is a toy example, tests file contained thousands of input strings and transactions, I don't know the exact numbers since those files were private and only available to professors)
 ```
 tr
 1 a a R 1
