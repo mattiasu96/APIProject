@@ -49,7 +49,7 @@ The ```acc``` section represents the accepting states.
 ```max``` represents the maximum number of computations before stopping the simulation 
 ```run``` contains all the input string to be simulated.
 
-The Turing Machine outputs 3 possible ending charachters:
+The Turing Machine outputs 3 possible ending characters:
 1) 1 -> the simulation has ended on a accepting state for the given input string. NB: in order to accept, all the branches of the simulation must end on an accepting state
 2) 0 -> the simulation has ended on a NON accepting state. NB: it is sufficient to have a single non-accepting state to refuse the input string
 3) U -> Undefined, one or more of the branches has reached the maximum amount of allowed computation (specified inside ```max```), thus the output is unknown
